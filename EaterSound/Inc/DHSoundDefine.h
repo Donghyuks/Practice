@@ -9,8 +9,8 @@
 #define EATERSOUND_DLL __declspec(dllimport)
 #endif
 
-// CString 사용.
-#include <atlstr.h>
+// String 사용.
+#include <string>
 
 // 사운드의 종류 지정.
 enum class EATERSOUND_DLL Sound_Category
@@ -30,3 +30,21 @@ struct EATERSOUND_DLL Sound_VFP
 	// 재생 속도
 	float Pitch		=	1.f;
 };
+
+// 3D 사운드를 위한 Vector3( 해당하는 오브젝트의 x,y,z 값의 포인터를 저장 )
+namespace SoundMath
+{
+	struct EATERSOUND_DLL Vector3
+	{
+		Vector3() {};
+		Vector3(float *_X, float *_Y, float *_Z) 
+		{
+			_x = _X;
+			_y = _Y;
+			_z = _Z;
+		};
+		float* _x = nullptr;
+		float* _y = nullptr;
+		float* _z = nullptr;
+	};
+}

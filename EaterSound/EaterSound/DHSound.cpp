@@ -53,7 +53,7 @@ Sound_VFP* DHSound::GetVFP(Sound_Category _Sound_Category)
 	}
 }
 
-ATL::CString* DHSound::GetFolderPath(Sound_Category _Sound_Category)
+std::string* DHSound::GetFolderPath(Sound_Category _Sound_Category)
 {
 	switch (_Sound_Category)
 	{
@@ -88,13 +88,26 @@ FMOD::Channel* DHSound::GetChannel()
 
 void DHSound::Update()
 {
+	// 듣는사람(청취자)가 있어야 업데이트가 의미가 있음.
+	if (_Listener != nullptr)
+	{
+		_Listener->Update();
+		Sound_System->set3DListenerAttributes(0, &_Listener->Fmod_Pos, &_Listener->Fmod_Vel, &_Listener->Fmod_Foward, &_Listener->Fmod_Up);
+		// 등록된 주솟값에 있는 float값으로 실시간 업데이트.
+		for (auto _3D_Object : Sound_Object_List)
+		{
+			_3D_Object.second->Update();
+			_3D_Object.second->SetAtt();
+		}
+	}
+
 	Sound_System->update();
 }
 
-void DHSound::SetSoundFolderPath(Sound_Category _Sound_Category, ATL::CString _Folder_Path)
+void DHSound::SetSoundFolderPath(Sound_Category _Sound_Category, std::string _Folder_Path)
 {
 	// 해당하는 path 를 들고온다.
-	ATL::CString* _Path = GetFolderPath(_Sound_Category);
+	std::string* _Path = GetFolderPath(_Sound_Category);
 
 	if (_Path == nullptr)
 	{
@@ -105,10 +118,10 @@ void DHSound::SetSoundFolderPath(Sound_Category _Sound_Category, ATL::CString _F
 	*_Path = _Folder_Path;
 }
 
-void DHSound::LoadSound(Sound_Category _Sound_Category, ATL::CString _Sound_Key, ATL::CString _File_Path, bool _Loop)
+void DHSound::LoadSound(Sound_Category _Sound_Category, std::string _Sound_Key, std::string _File_Path, bool _Loop)
 {
 	// 해당하는 path 를 들고온다.
-	ATL::CString* _Path = GetFolderPath(_Sound_Category);
+	std::string* _Path = GetFolderPath(_Sound_Category);
 
 	if (_Path == nullptr || *_Path == "NonSet")
 	{
@@ -117,7 +130,7 @@ void DHSound::LoadSound(Sound_Category _Sound_Category, ATL::CString _Sound_Key,
 	}
 
 	// 해당하는 파일에 총 path를 완성시킨다.
-	std::string _Totla_Path = std::string(CT2CA(*_Path + _File_Path));
+	std::string _Totla_Path = *_Path + _File_Path;
 
 	FMOD::Sound* _New_Sound = nullptr;
 
@@ -293,7 +306,7 @@ void DHSound::PitchDown(Sound_Category _Sound_Category)
 	}
 }
 
-void DHSound::PlaySound(Sound_Category _Sound_Category, ATL::CString _Sound_Key)
+void DHSound::SoundPlay(Sound_Category _Sound_Category, std::string _Sound_Key)
 {
 	if (_Sound_Category == Sound_Category::Master)
 	{
@@ -335,27 +348,20 @@ void DHSound::PauseSound(Sound_Category _Sound_Category, bool _Play)
 	_CG->setPaused(_Play);
 }
 
-void DHSound::Set3DListener(DirectX::XMMATRIX* _View_Matrix, DirectX::XMFLOAT3 _Velocity)
+void DHSound::Set3DListener(SoundMath::Vector3 _Pos, SoundMath::Vector3 _Foward_Vec, SoundMath::Vector3 _Up_Vec, SoundMath::Vector3 _Velocity)
 {
-	// 카메라의 위치는 뷰 행렬의 역행렬에서 구할 수 있다.
-	DirectX::XMFLOAT4X4 Inverse_View_Matrix;
-	DirectX::XMVECTOR det;
-	XMStoreFloat4x4(&Inverse_View_Matrix, XMMatrixInverse(&det, *_View_Matrix));
-
-	FMOD_3D_ATTRIBUTES listener;
-	// 리스너의 위치와 전방 벡터, 상향 벡터를 설정
-	listener.position = ConvertFmodVector(DirectX::XMFLOAT3(Inverse_View_Matrix._41, Inverse_View_Matrix._42, Inverse_View_Matrix._43));
-	// 뷰 행렬의 역행렬에서 세 번째 행은 전방 벡터
-	listener.forward = ConvertFmodVector(DirectX::XMFLOAT3(Inverse_View_Matrix._31, Inverse_View_Matrix._32, Inverse_View_Matrix._33));
-	// 뷰 행렬의 역행렬에서 두 번째 행은 상향 벡터
-	listener.up = ConvertFmodVector(DirectX::XMFLOAT3(Inverse_View_Matrix._21, Inverse_View_Matrix._22, Inverse_View_Matrix._23));
-	// 리스너의 속도 설정. 도플러 효과를 연산하기 위해 필요
-	listener.velocity = ConvertFmodVector(_Velocity);
-	// FMOD로 보낸다 (0 = 리스너는 하나)
-	Sound_System->set3DListenerAttributes(0, &listener.position, &listener.velocity, &listener.forward, &listener.up);
+	// 만약 이미 셋팅된 Listener 가 존재한다면 해당 리스너를 제거하고 새로 등록.
+	if (_Listener != nullptr)
+	{
+		delete _Listener;
+		_Listener = nullptr;
+	}
+	// 리스너에 대한 구조체를 만들어주고 초기값을 설정해준다.
+	_Listener = new Listener_PosFowardUpVelocity(_Pos, _Foward_Vec, _Up_Vec, _Velocity);
+	Sound_System->set3DListenerAttributes(0, &_Listener->Fmod_Pos, &_Listener->Fmod_Vel, &_Listener->Fmod_Foward, &_Listener->Fmod_Up);
 }
 
-void DHSound::Set3DSoundObject(Sound_Category _Sound_Category, ATL::CString _Sound_Key, DirectX::XMFLOAT3 _Position, DirectX::XMFLOAT3 _Velocity)
+void DHSound::Set3DSoundObject(Sound_Category _Sound_Category, std::string _Sound_Key, SoundMath::Vector3 _Position, SoundMath::Vector3 _Velocity, std::string _Object_Name)
 {
 	if (_Sound_Category == Sound_Category::Master)
 	{
@@ -379,11 +385,55 @@ void DHSound::Set3DSoundObject(Sound_Category _Sound_Category, ATL::CString _Sou
 	Sound_System->playSound(_Play_Sound, _CG, false, &_Play_Channel);
 	// 채널그룹에 채널 등록
 	_Play_Channel->setChannelGroup(_CG);
-	// 해당 오브젝트의 포지션, 속도값 등록..
-	_Play_Channel->set3DAttributes(&ConvertFmodVector(_Position), &ConvertFmodVector(_Velocity));
+	// 해당 오브젝트에 대한 포지션, 속도값을 저장해둘 구조체 선언.
+	Object_PosVelocity* _New_Object_Data = new Object_PosVelocity(_Play_Channel, _Position, _Velocity);
+	// 해당 오브젝트를 3D 오브젝트로 Fmod에 등록
+	_Play_Channel->set3DAttributes(&_New_Object_Data->Fmod_Pos, &_New_Object_Data->Fmod_Pos);
+	// 해당 데이터를 오브젝트 이름과 같이 관리 리스트에 추가.
+	Sound_Object_List.insert({ _Object_Name, _New_Object_Data });
 }
 
-FMOD_VECTOR DHSound::ConvertFmodVector(DirectX::XMFLOAT3 _Vector3)
+void DHSound::Delete3DSoundObject(std::string _Object_Name)
 {
-	FMOD_VECTOR()
+	// 해당 오브젝트 이름에 해당하는 iterator를 받아온다.
+	auto itr = Sound_Object_List.find(_Object_Name);
+	if (itr == Sound_Object_List.end())
+	{
+		printf("[DHSound 3DObject Delete Error] 존재하지 않는 3D 사운드 오브젝트를 삭제하려 했습니다.");
+		return;
+	}
+
+	// 해당 채널을 종료시켜주고
+	Sound_Object_List[_Object_Name]->m_Channel->stop();
+	// 해당 값을 삭제.
+	Sound_Object_List.erase(itr);
+}
+
+void DHSound::Load3DSound(Sound_Category _Sound_Category, std::string _Sound_Key, std::string _File_Path, bool _Loop)
+{
+	// 해당하는 path 를 들고온다.
+	std::string* _Path = GetFolderPath(_Sound_Category);
+
+	if (_Path == nullptr || *_Path == "NonSet")
+	{
+		printf("[DHSound Load3DSound Error] Sound를 읽어오지 못했습니다. 폴더 경로를 먼저 설정하거나 올바른 Category를 지정하세요.");
+		return;
+	}
+
+	// 해당하는 파일에 총 path를 완성시킨다.
+	std::string _Totla_Path = *_Path + _File_Path;
+
+	FMOD::Sound* _New_Sound = nullptr;
+
+	// 해당하는 사운드 생성
+	if (_Loop) { Sound_System->createSound(_Totla_Path.c_str(), FMOD_3D | FMOD_LOOP_NORMAL, nullptr, &_New_Sound); }
+	else { Sound_System->createSound(_Totla_Path.c_str(), FMOD_3D, nullptr, &_New_Sound); }
+
+	// 사운드 리스트에 추가.
+	Sound_Resource.insert({ _Sound_Key, _New_Sound });
+}
+
+void DHSound::Set3DDoppler(float _Scale, float _Distance_Factor, float _Roll_Off_Scale)
+{
+	Sound_System->set3DSettings(_Scale, _Distance_Factor, _Roll_Off_Scale);
 }
