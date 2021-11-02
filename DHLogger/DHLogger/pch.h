@@ -9,12 +9,13 @@
 
 // 여기에 미리 컴파일하려는 헤더 추가
 /// windows
-#include "framework.h"
+#include "windows.h"
 #include <thread>
 #include <functional>
 
 /// IO
 #include <iostream>
 #include "stdio.h"
+#include <string.h>
 
 #endif //PCH_H

@@ -13,22 +13,13 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Ref">
-      <UniqueIdentifier>{711bcbb3-57c8-4cd5-942d-6b31976542d2}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="pch.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="DHLogger.h">
       <Filter>DHLogger</Filter>
-    </ClInclude>
-    <ClInclude Include="LogManager.h">
-      <Filter>Ref</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -40,9 +31,6 @@
     </ClCompile>
     <ClCompile Include="DHLogger.cpp">
       <Filter>DHLogger</Filter>
-    </ClCompile>
-    <ClCompile Include="LogManager.cpp">
-      <Filter>Ref</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
