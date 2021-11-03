@@ -4,6 +4,35 @@
 
 DHLogger::DHLogger()
 {
+	// 파일의 이름.
+	File_Title = const_cast<TCHAR*>(DEFAULT_FILE_NAME);
+	// 현재 Log라는 폴더가 생성이 되어있는가? 를 확인한 뒤 생성되어 있지 않다면 폴더를 생성한다.
+	if (INVALID_FILE_ATTRIBUTES == GetFileAttributes(LOG_DIRECTORY))
+	{
+		const DWORD error = GetLastError();
+		CreateDirectory(LOG_DIRECTORY, NULL);
+	}
+
+	// 생성된 Log 폴더에 txt 파일을 만들기 위해 경로를 설정하고 핸들을 받아온다.
+	SetCurrentDirectory(LOG_PATH);
+	hFileWirte = CreateFile(GetCurrentTimeTitle(), GENERIC_WRITE, 0, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+
+	if (hFileWirte == INVALID_HANDLE_VALUE)
+	{
+		const DWORD error = GetLastError();
+
+		_tprintf(_T("[DHLogger 생성자 오류] hFileWrite를 올바르게 생성하지 못했습니다.\n"));
+	}
+
+	//CreateDirectory(String_to_TCHAR(Path), lpSecurityAttributes);
+
+	WorkThread = new std::thread(std::bind(&DHLogger::WorkThreadFunction, this));
+}
+
+DHLOG_DLL DHLogger::DHLogger(const TCHAR* _File_Title)
+{
+	// 파일의 이름.
+	File_Title = const_cast<TCHAR*>(_File_Title);
 	// 현재 Log라는 폴더가 생성이 되어있는가? 를 확인한 뒤 생성되어 있지 않다면 폴더를 생성한다.
 	if (INVALID_FILE_ATTRIBUTES == GetFileAttributes(LOG_DIRECTORY))
 	{
@@ -48,7 +77,7 @@ TCHAR* DHLogger::GetCurrentTimeTitle()
 {
 	TCHAR Write_Current_Time[MAX_WORD];
 	GetLocalTime(&Local_Time);
-	_stprintf_s(Write_Current_Time, _T("[DHLog] %02d-%02d-%02d %02dh %02dm %02ds.log"),
+	_stprintf_s(Write_Current_Time, _T("[%s] %02d-%02d-%02d %02dh %02dm %02ds.log"), File_Title,
 		Local_Time.wYear, Local_Time.wMonth, Local_Time.wDay,
 		Local_Time.wHour, Local_Time.wMinute, Local_Time.wSecond);
 
@@ -79,7 +108,7 @@ SYSTEMTIME DHLogger::_GetLocalTime()
 	return Local_Time;
 }
 
-void DHLogger::WriteLog(LogType _Log_Type, TCHAR* _Write_Data)
+void DHLogger::WriteLog(LogType _Log_Type, const TCHAR* _Write_Data)
 {
 	// 로그 타입에 대한 텍스트 받아오기.
 	std::wstring _LogType_Text(GetLogTypeText(_Log_Type));
@@ -88,8 +117,21 @@ void DHLogger::WriteLog(LogType _Log_Type, TCHAR* _Write_Data)
 	// "[타입][시간] 메세지" 형식으로 저장됨.
 	std::wstring _Total_Text = _LogType_Text + _Time_Text + _Write_Data +_T("\r\n");
 
-	// 해당 갑승ㄹ 생성하고 페어로 넣어줌.
+	// 해당 값을 생성하고 페어로 넣어줌.
 	TCHAR* _T_Total_Text = new TCHAR[_Total_Text.size()+1];
+	wcscpy(_T_Total_Text, (wchar_t*)(_Total_Text.c_str()));
+	Log_Queue.push({ _Total_Text.size(), _T_Total_Text });
+}
+
+DHLOG_DLL void DHLogger::WriteLog(const TCHAR* _Log_Title, const TCHAR* _Write_Data)
+{
+	// 현재 시간 텍스트
+	std::wstring _Time_Text(GetCurrentTimeText());
+	// "[타입][시간] 메세지" 형식으로 저장됨.
+	std::wstring _Total_Text = _T("[") + std::wstring(_Log_Title) + _T("]") + _Time_Text + _Write_Data + _T("\r\n");
+
+	// 해당 값을 생성하고 페어로 넣어줌.
+	TCHAR* _T_Total_Text = new TCHAR[_Total_Text.size() + 1];
 	wcscpy(_T_Total_Text, (wchar_t*)(_Total_Text.c_str()));
 	Log_Queue.push({ _Total_Text.size(), _T_Total_Text });
 }

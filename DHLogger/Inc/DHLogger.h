@@ -3,6 +3,7 @@
 #define MAX_WORD 1024
 #define LOG_DIRECTORY _T("..\\Log")
 #define LOG_PATH _T("..\\Log\\")
+#define DEFAULT_FILE_NAME _T("STATE LOG")
 
 #ifdef DHLOGGER_EXPORTS
 #define DHLOG_DLL __declspec(dllexport)
@@ -40,14 +41,21 @@ private:
 	Concurrency::concurrent_queue<std::pair<int,TCHAR*>> Log_Queue;
 	// 로그 파일을 저장할 경로
 	TCHAR* File_Name = nullptr;
+	// 파일의 제목
+	TCHAR* File_Title = nullptr;
 
 public:
+	// 기본 생성자 호출시 파일의 이름은 STATE LOG 라고 붙는다.
 	DHLOG_DLL DHLogger();
+	// 파일의 이름을 설정.
+	DHLOG_DLL DHLogger(const TCHAR* _File_Title);
 	~DHLogger();
 	// 로컬시간 불러오기
 	DHLOG_DLL SYSTEMTIME _GetLocalTime();
 	// 파일 쓰기
-	DHLOG_DLL void WriteLog(LogType _Log_Type, TCHAR* _Write_Data);
+	DHLOG_DLL void WriteLog(LogType _Log_Type, const TCHAR* _Write_Data);
+	// 지정된 LogType 을 제외하고 사용자 지정 타입을 붙여서 로그파일 기록. ex) [매우매우중요] LOG...
+	DHLOG_DLL void WriteLog(const TCHAR* _Log_Title, const TCHAR* _Write_Data);
 	// 로거 해제.
 	DHLOG_DLL void Release();
 	// 쓰레드 함수.
