@@ -13,7 +13,7 @@
 #include <string>
 
 // 사운드의 종류 지정.
-enum class EATERSOUND_DLL Sound_Category
+enum class Sound_Category
 {
 	BGM,	// BGM 종류 사운드
 	SFX,	// SFX 종류 사운드
@@ -21,7 +21,7 @@ enum class EATERSOUND_DLL Sound_Category
 };
 
 // 사운드의 볼륨 / 프리퀀시 / 피치
-struct EATERSOUND_DLL Sound_VFP
+struct Sound_VFP
 {
 	// 사운드 볼륨
 	float Volume	=	1.f;
@@ -34,7 +34,7 @@ struct EATERSOUND_DLL Sound_VFP
 // 3D 사운드를 위한 Vector3( 해당하는 오브젝트의 x,y,z 값의 포인터를 저장 )
 namespace SoundMath
 {
-	struct EATERSOUND_DLL Vector3
+	struct Vector3
 	{
 		Vector3() {};
 		Vector3(float *_X, float *_Y, float *_Z) 

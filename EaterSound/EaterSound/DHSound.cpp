@@ -107,7 +107,8 @@ void DHSound::Update()
 void DHSound::SetSoundFolderPath(Sound_Category _Sound_Category, std::string _Folder_Path)
 {
 	// 해당하는 path 를 들고온다.
-	std::string* _Path = GetFolderPath(_Sound_Category);
+	std::string* _Path = nullptr;
+	_Path = GetFolderPath(_Sound_Category);
 
 	if (_Path == nullptr)
 	{
@@ -121,7 +122,8 @@ void DHSound::SetSoundFolderPath(Sound_Category _Sound_Category, std::string _Fo
 void DHSound::LoadSound(Sound_Category _Sound_Category, std::string _Sound_Key, std::string _File_Path, bool _Loop)
 {
 	// 해당하는 path 를 들고온다.
-	std::string* _Path = GetFolderPath(_Sound_Category);
+	std::string* _Path = nullptr;
+	_Path = GetFolderPath(_Sound_Category);
 
 	if (_Path == nullptr || *_Path == "NonSet")
 	{
@@ -153,8 +155,10 @@ void DHSound::VolumeSet(Sound_Category _Sound_Category, float _Set_Volume)
 	if (_Set_Volume > 1) { _Set_Volume = 1.f; }
 
 	// 해당 채널그룹과 볼륨값을 가져와서 세팅해줌.
-	FMOD::ChannelGroup* _CG = GetChannelGroup(_Sound_Category);
-	Sound_VFP* _Vol = GetVFP(_Sound_Category);
+	FMOD::ChannelGroup* _CG = nullptr;
+	_CG = GetChannelGroup(_Sound_Category);
+	Sound_VFP* _Vol = nullptr;
+	_Vol = GetVFP(_Sound_Category);
 
 	_Vol->Volume = _Set_Volume;
 	_CG->setVolume(_Set_Volume);
@@ -163,8 +167,10 @@ void DHSound::VolumeSet(Sound_Category _Sound_Category, float _Set_Volume)
 void DHSound::VolumeUp(Sound_Category _Sound_Category)
 {
 	// 해당 채널그룹과 볼륨값을 가져옴.
-	FMOD::ChannelGroup* _CG = GetChannelGroup(_Sound_Category);
-	Sound_VFP* _Vol = GetVFP(_Sound_Category);
+	FMOD::ChannelGroup* _CG = nullptr;
+	_CG = GetChannelGroup(_Sound_Category);
+	Sound_VFP* _Vol = nullptr;
+	_Vol = GetVFP(_Sound_Category);
 
 	// 현재 지정된 볼륨의 가중치에 따라 볼륨을 증가시켜 적용한다.
 	_Vol->Volume += Volume_Factor;
@@ -177,8 +183,10 @@ void DHSound::VolumeUp(Sound_Category _Sound_Category)
 void DHSound::VolumeDown(Sound_Category _Sound_Category)
 {
 	// 해당 채널그룹과 볼륨값을 가져옴.
-	FMOD::ChannelGroup* _CG = GetChannelGroup(_Sound_Category);
-	Sound_VFP* _Vol = GetVFP(_Sound_Category);
+	FMOD::ChannelGroup* _CG = nullptr;
+	_CG = GetChannelGroup(_Sound_Category);
+	Sound_VFP* _Vol = nullptr;
+	_Vol = GetVFP(_Sound_Category);
 
 	// 현재 지정된 볼륨의 가중치에 따라 볼륨을 감소시켜 적용한다.
 	_Vol->Volume -= Volume_Factor;
@@ -196,8 +204,10 @@ void DHSound::SetFrequencyFactor(float _Set_Factor)
 void DHSound::FrequencySet(Sound_Category _Sound_Category, float _Set_Frequency)
 {
 	// 해당 채널그룹과 프리퀀시값을 가져와서 세팅해줌.
-	FMOD::ChannelGroup* _CG = GetChannelGroup(_Sound_Category);
-	Sound_VFP* _Fre = GetVFP(_Sound_Category);
+	FMOD::ChannelGroup* _CG = nullptr;
+	_CG = GetChannelGroup(_Sound_Category);
+	Sound_VFP* _Fre = nullptr;
+	_Fre = GetVFP(_Sound_Category);
 
 	_Fre->FreQuency = _Set_Frequency;
 	_CG->setVolume(_Set_Frequency);
@@ -206,8 +216,10 @@ void DHSound::FrequencySet(Sound_Category _Sound_Category, float _Set_Frequency)
 void DHSound::FrequencyUp(Sound_Category _Sound_Category)
 {
 	// 해당 채널그룹과 프리퀀시값을 가져옴.
-	FMOD::ChannelGroup* _CG = GetChannelGroup(_Sound_Category);
-	Sound_VFP* _Fre = GetVFP(_Sound_Category);
+	FMOD::ChannelGroup* _CG = nullptr;
+	_CG = GetChannelGroup(_Sound_Category);
+	Sound_VFP* _Fre = nullptr;
+	_Fre = GetVFP(_Sound_Category);
 
 	// 현재 지정된 프리퀀시의 가중치에 따라 증가시켜 적용한다.
 	_Fre->FreQuency += Frequency_Factor;
@@ -227,8 +239,10 @@ void DHSound::FrequencyUp(Sound_Category _Sound_Category)
 void DHSound::FrequencyDown(Sound_Category _Sound_Category)
 {
 	// 해당 채널그룹과 프리퀀시값을 가져옴.
-	FMOD::ChannelGroup* _CG = GetChannelGroup(_Sound_Category);
-	Sound_VFP* _Fre = GetVFP(_Sound_Category);
+	FMOD::ChannelGroup* _CG = nullptr;
+	_CG = GetChannelGroup(_Sound_Category);
+	Sound_VFP* _Fre = nullptr;
+	_Fre = GetVFP(_Sound_Category);
 
 	// 현재 지정된 프리퀀시의 가중치에 따라 증가시켜 적용한다.
 	_Fre->FreQuency -= Frequency_Factor;
@@ -254,8 +268,10 @@ void DHSound::PitchSet(Sound_Category _Sound_Category, float _Set_Pitch)
 {
 	if (_Set_Pitch < 0) { _Set_Pitch = 0; }
 	// 해당 채널그룹과 피치값을 가져와서 세팅해줌.
-	FMOD::ChannelGroup* _CG = GetChannelGroup(_Sound_Category);
-	Sound_VFP* _Pitch = GetVFP(_Sound_Category);
+	FMOD::ChannelGroup* _CG = nullptr;
+	_CG = GetChannelGroup(_Sound_Category);
+	Sound_VFP* _Pitch = nullptr;
+	_Pitch = GetVFP(_Sound_Category);
 
 	_Pitch->Pitch = _Set_Pitch;
 	_CG->setVolume(_Set_Pitch);
@@ -264,8 +280,10 @@ void DHSound::PitchSet(Sound_Category _Sound_Category, float _Set_Pitch)
 void DHSound::PitchUp(Sound_Category _Sound_Category)
 {
 	// 해당 채널그룹과 피치값을 가져옴.
-	FMOD::ChannelGroup* _CG = GetChannelGroup(_Sound_Category);
-	Sound_VFP* _Pitch = GetVFP(_Sound_Category);
+	FMOD::ChannelGroup* _CG = nullptr;
+	_CG = GetChannelGroup(_Sound_Category);
+	Sound_VFP* _Pitch = nullptr;
+	_Pitch = GetVFP(_Sound_Category);
 
 	// 현재 지정된 피치의 가중치에 따라 증가시켜 적용한다.
 	_Pitch->Pitch += Pitch_Factor;
@@ -286,8 +304,10 @@ void DHSound::PitchUp(Sound_Category _Sound_Category)
 void DHSound::PitchDown(Sound_Category _Sound_Category)
 {
 	// 해당 채널그룹과 피치값을 가져옴.
-	FMOD::ChannelGroup* _CG = GetChannelGroup(_Sound_Category);
-	Sound_VFP* _Pitch = GetVFP(_Sound_Category);
+	FMOD::ChannelGroup* _CG = nullptr;
+	_CG = GetChannelGroup(_Sound_Category);
+	Sound_VFP* _Pitch = nullptr;
+	_Pitch = GetVFP(_Sound_Category);
 
 	// 현재 지정된 피치의 가중치에 따라 증가시켜 적용한다.
 	_Pitch->Pitch -= Pitch_Factor;
@@ -321,11 +341,14 @@ void DHSound::SoundPlay(Sound_Category _Sound_Category, std::string _Sound_Key)
 	}
 
 	// 재생할 사운드를 가져옴.
-	FMOD::Sound* _Play_Sound = Sound_Resource[_Sound_Key];
+	FMOD::Sound* _Play_Sound = nullptr;
+	_Play_Sound = Sound_Resource[_Sound_Key];
 	// 해당 채널그룹을 가져옴.
-	FMOD::ChannelGroup* _CG = GetChannelGroup(_Sound_Category);
+	FMOD::ChannelGroup* _CG = nullptr;
+	_CG = GetChannelGroup(_Sound_Category);
 	// 재생할 채널을 가져옴.
-	FMOD::Channel* _Play_Channel = GetChannel();
+	FMOD::Channel* _Play_Channel = nullptr;
+	_Play_Channel = GetChannel();
 	// 해당 사운드 재생
 	Sound_System->playSound(_Play_Sound, _CG, false, &_Play_Channel);
 	// 채널그룹에 채널 등록
@@ -335,7 +358,8 @@ void DHSound::SoundPlay(Sound_Category _Sound_Category, std::string _Sound_Key)
 void DHSound::StopSound(Sound_Category _Sound_Category)
 {
 	// 해당 채널그룹을 가져옴.
-	FMOD::ChannelGroup* _CG = GetChannelGroup(_Sound_Category);
+	FMOD::ChannelGroup* _CG = nullptr;
+	_CG = GetChannelGroup(_Sound_Category);
 	// 해당 채널그룹 재생중지.
 	_CG->stop();
 }
@@ -343,7 +367,8 @@ void DHSound::StopSound(Sound_Category _Sound_Category)
 void DHSound::PauseSound(Sound_Category _Sound_Category, bool _Play)
 {
 	// 해당 채널그룹을 가져옴.
-	FMOD::ChannelGroup* _CG = GetChannelGroup(_Sound_Category);
+	FMOD::ChannelGroup* _CG = nullptr;
+	_CG = GetChannelGroup(_Sound_Category);
 	// 재생 / 일시중지 요청에 따라 실행.
 	_CG->setPaused(_Play);
 }
@@ -378,7 +403,8 @@ void DHSound::Set3DSoundObject(Sound_Category _Sound_Category, std::string _Soun
 	// 재생할 사운드를 가져옴.
 	FMOD::Sound* _Play_Sound = Sound_Resource[_Sound_Key];
 	// 해당 채널그룹을 가져옴.
-	FMOD::ChannelGroup* _CG = GetChannelGroup(_Sound_Category);
+	FMOD::ChannelGroup* _CG = nullptr;
+	_CG = GetChannelGroup(_Sound_Category);
 	// 재생할 채널을 가져옴.
 	FMOD::Channel* _Play_Channel = GetChannel();
 	// 해당 사운드 재생
@@ -412,7 +438,8 @@ void DHSound::Delete3DSoundObject(std::string _Object_Name)
 void DHSound::Load3DSound(Sound_Category _Sound_Category, std::string _Sound_Key, std::string _File_Path, bool _Loop)
 {
 	// 해당하는 path 를 들고온다.
-	std::string* _Path = GetFolderPath(_Sound_Category);
+	std::string* _Path = nullptr;
+	_Path = GetFolderPath(_Sound_Category);
 
 	if (_Path == nullptr || *_Path == "NonSet")
 	{

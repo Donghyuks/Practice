@@ -124,22 +124,26 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ImportLibrary\Inc</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)ImportLibrary\lib\Debug</AdditionalLibraryDirectories>
       <AdditionalDependencies>DHLogger.lib;DHKeyIO.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>mkdir "$(SolutionDir)lib"
+mkdir "$(SolutionDir)lib\Debug"
 mkdir "$(SolutionDir)Inc"
-copy /Y "$(TargetDir)*.lib" "$(SolutionDir)lib"
-copy /Y "$(TargetDir)*.dll" "$(SolutionDir)lib"
+copy /Y "$(TargetDir)*.lib" "$(SolutionDir)lib\Debug"
+copy /Y "$(TargetDir)*.dll" "$(SolutionDir)lib\Debug"
 copy /Y "$(ProjectDir)$(TargetName).h" "$(SolutionDir)Inc"</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>copy /Y "$(SolutionDir)ImportLibrary\lib\Debug\*.dll" "$(TargetDir)"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -151,7 +155,7 @@ copy /Y "$(ProjectDir)$(TargetName).h" "$(SolutionDir)Inc"</Command>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ImportLibrary\Inc</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -160,15 +164,19 @@ copy /Y "$(ProjectDir)$(TargetName).h" "$(SolutionDir)Inc"</Command>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>DHLogger.lib;DHKeyIO.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)ImportLibrary\lib\Release</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>mkdir "$(SolutionDir)lib"
+mkdir "$(SolutionDir)lib\Release"
 mkdir "$(SolutionDir)Inc"
-copy /Y "$(TargetDir)*.lib" "$(SolutionDir)lib"
-copy /Y "$(TargetDir)*.dll" "$(SolutionDir)lib"
+copy /Y "$(TargetDir)*.lib" "$(SolutionDir)lib\Release"
+copy /Y "$(TargetDir)*.dll" "$(SolutionDir)lib\Release"
 copy /Y "$(ProjectDir)$(TargetName).h" "$(SolutionDir)Inc"</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>copy /Y "$(SolutionDir)ImportLibrary\lib\Release\*.dll" "$(TargetDir)"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DHDebugger.h" />

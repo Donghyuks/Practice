@@ -117,20 +117,26 @@
       <PreprocessorDefinitions>_DEBUG;EATERSOUND_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ImportLibrary\Inc</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)ImportLibrary\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>fmod_vc.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(TargetDir)*.lib" "$(SolutionDir)lib"
-copy /Y "$(TargetDir)*.dll" "$(SolutionDir)lib"
+      <Command>mkdir "$(SolutionDir)lib"
+mkdir "$(SolutionDir)lib\Debug"
+mkdir "$(SolutionDir)Inc"
+copy /Y "$(TargetDir)*.lib" "$(SolutionDir)lib\Debug"
+copy /Y "$(TargetDir)*.dll" "$(SolutionDir)lib\Debug"
 copy /Y "$(ProjectDir)$(TargetName).h" "$(SolutionDir)Inc"
 copy /Y "$(ProjectDir)DHSoundDefine.h" "$(SolutionDir)Inc"</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>copy /Y "$(SolutionDir)ImportLibrary\lib\Debug\*.dll" "$(TargetDir)"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -141,22 +147,28 @@ copy /Y "$(ProjectDir)DHSoundDefine.h" "$(SolutionDir)Inc"</Command>
       <PreprocessorDefinitions>NDEBUG;EATERSOUND_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ImportLibrary\Inc</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)ImportLibrary\lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>fmod_vc.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(TargetDir)*.lib" "$(SolutionDir)lib"
-copy /Y "$(TargetDir)*.dll" "$(SolutionDir)lib"
+      <Command>mkdir "$(SolutionDir)lib"
+mkdir "$(SolutionDir)lib\Release"
+mkdir "$(SolutionDir)Inc"
+copy /Y "$(TargetDir)*.lib" "$(SolutionDir)lib\Release"
+copy /Y "$(TargetDir)*.dll" "$(SolutionDir)lib\Release"
 copy /Y "$(ProjectDir)$(TargetName).h" "$(SolutionDir)Inc"
 copy /Y "$(ProjectDir)DHSoundDefine.h" "$(SolutionDir)Inc"</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>copy /Y "$(SolutionDir)ImportLibrary\lib\Release\*.dll" "$(TargetDir)"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DHSound.h" />

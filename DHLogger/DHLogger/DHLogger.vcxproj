@@ -132,9 +132,10 @@
     </Link>
     <PostBuildEvent>
       <Command>mkdir "$(SolutionDir)lib"
+mkdir "$(SolutionDir)lib\Debug"
 mkdir "$(SolutionDir)Inc"
-copy /Y "$(TargetDir)*.lib" "$(SolutionDir)lib"
-copy /Y "$(TargetDir)*.dll" "$(SolutionDir)lib"
+copy /Y "$(TargetDir)*.lib" "$(SolutionDir)lib\Debug"
+copy /Y "$(TargetDir)*.dll" "$(SolutionDir)lib\Debug"
 copy /Y "$(ProjectDir)$(TargetName).h" "$(SolutionDir)Inc"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -158,9 +159,10 @@ copy /Y "$(ProjectDir)$(TargetName).h" "$(SolutionDir)Inc"</Command>
     </Link>
     <PostBuildEvent>
       <Command>mkdir "$(SolutionDir)lib"
+mkdir "$(SolutionDir)lib\Release"
 mkdir "$(SolutionDir)Inc"
-copy /Y "$(TargetDir)*.lib" "$(SolutionDir)lib"
-copy /Y "$(TargetDir)*.dll" "$(SolutionDir)lib"
+copy /Y "$(TargetDir)*.lib" "$(SolutionDir)lib\Release"
+copy /Y "$(TargetDir)*.dll" "$(SolutionDir)lib\Release"
 copy /Y "$(ProjectDir)$(TargetName).h" "$(SolutionDir)Inc"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
