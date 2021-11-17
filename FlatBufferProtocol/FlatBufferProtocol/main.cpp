@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 
+
 int main()
 {
 	/// 플랫버퍼의 빌더 생성.
