@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Main">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="LobbyManager">
+      <UniqueIdentifier>{53098f89-025d-4fd3-8329-fe562cfc0e25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameManager">
+      <UniqueIdentifier>{2c23b364-60be-4ee0-a46c-988edfaa3397}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GS-LobbyPacket">
+      <UniqueIdentifier>{309d6edd-4f7a-479c-9d45-a1f3dd6b68e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Timer">
+      <UniqueIdentifier>{aa5e7d31-5163-4ff5-99ca-c3d42b663455}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="LobbyManager.cpp">
+      <Filter>LobbyManager</Filter>
+    </ClCompile>
+    <ClCompile Include="GameManager.cpp">
+      <Filter>GameManager</Filter>
+    </ClCompile>
+    <ClCompile Include="DHTimer.cpp">
+      <Filter>Timer</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="LobbyManager.h">
+      <Filter>LobbyManager</Filter>
+    </ClInclude>
+    <ClInclude Include="GameManager.h">
+      <Filter>GameManager</Filter>
+    </ClInclude>
+    <ClInclude Include="GameServerLobbyPacketDefine.h">
+      <Filter>GS-LobbyPacket</Filter>
+    </ClInclude>
+    <ClInclude Include="GameClientGameServerPacketDefine.h">
+      <Filter>GS-LobbyPacket</Filter>
+    </ClInclude>
+    <ClInclude Include="DHTimer.h">
+      <Filter>Timer</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

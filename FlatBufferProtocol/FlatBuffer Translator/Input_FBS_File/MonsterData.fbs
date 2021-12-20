@@ -1,0 +1,33 @@
+// Player 패킷 데이터.
+
+// 데이터 형에 대한 정의
+// 8 bit: byte (int8), ubyte (uint8), bool
+// 16 bit: short (int16), ushort (uint16)
+// 32 bit: int (int32), uint (uint32), float (float32)
+// 64 bit: long (int64), ulong (uint64), double (float64)
+
+namespace Eater.MonsterData;
+
+// 사용될 구조체들에 대한 정의
+
+// 3D 상의 Vector
+struct Vec3
+{
+	x:float;
+	y:float;
+	z:float;
+}
+
+// 실제 게임 데이터에 대한 정의
+
+
+table Monster
+{
+	name:string;
+	pos:Vec3;
+	mov_vector:Vec3;
+	hp:uint;
+	mana:uint;
+}
+
+root_type Monster;
