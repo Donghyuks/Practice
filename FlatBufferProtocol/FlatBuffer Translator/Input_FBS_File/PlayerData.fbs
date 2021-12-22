@@ -20,14 +20,12 @@ struct Vec3
 
 // 실제 게임 데이터에 대한 정의
 
-
 table Player
 {
-	name:string;
+	identifier:short;
 	pos:Vec3;
 	mov_vector:Vec3;
 	hp:uint;
-	mana:uint;
 }
 
 root_type Player;

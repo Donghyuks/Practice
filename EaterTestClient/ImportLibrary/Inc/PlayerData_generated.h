@@ -7,172 +7,233 @@
 #include "flatbuffers/flatbuffers.h"
 
 namespace Eater {
-namespace PlayerData {
+	namespace PlayerData {
 
-struct Vec3;
+		struct Vec3;
 
-struct Player;
-struct PlayerBuilder;
+		struct PlayerList;
+		struct PlayerListBuilder;
 
-FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Vec3 FLATBUFFERS_FINAL_CLASS {
- private:
-  float x_;
-  float y_;
-  float z_;
+		struct Player;
+		struct PlayerBuilder;
 
- public:
-  Vec3()
-      : x_(0),
-        y_(0),
-        z_(0) {
-  }
-  Vec3(float _x, float _y, float _z)
-      : x_(flatbuffers::EndianScalar(_x)),
-        y_(flatbuffers::EndianScalar(_y)),
-        z_(flatbuffers::EndianScalar(_z)) {
-  }
-  float x() const {
-    return flatbuffers::EndianScalar(x_);
-  }
-  float y() const {
-    return flatbuffers::EndianScalar(y_);
-  }
-  float z() const {
-    return flatbuffers::EndianScalar(z_);
-  }
-};
-FLATBUFFERS_STRUCT_END(Vec3, 12);
+		FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Vec3 FLATBUFFERS_FINAL_CLASS {
+		private:
+			float x_;
+			float y_;
+			float z_;
 
-struct Player FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef PlayerBuilder Builder;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_NAME = 4,
-    VT_POS = 6,
-    VT_MOV_VECTOR = 8,
-    VT_HP = 10,
-    VT_MANA = 12
-  };
-  const flatbuffers::String *name() const {
-    return GetPointer<const flatbuffers::String *>(VT_NAME);
-  }
-  const Eater::PlayerData::Vec3 *pos() const {
-    return GetStruct<const Eater::PlayerData::Vec3 *>(VT_POS);
-  }
-  const Eater::PlayerData::Vec3 *mov_vector() const {
-    return GetStruct<const Eater::PlayerData::Vec3 *>(VT_MOV_VECTOR);
-  }
-  uint32_t hp() const {
-    return GetField<uint32_t>(VT_HP, 0);
-  }
-  uint32_t mana() const {
-    return GetField<uint32_t>(VT_MANA, 0);
-  }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_NAME) &&
-           verifier.VerifyString(name()) &&
-           VerifyField<Eater::PlayerData::Vec3>(verifier, VT_POS) &&
-           VerifyField<Eater::PlayerData::Vec3>(verifier, VT_MOV_VECTOR) &&
-           VerifyField<uint32_t>(verifier, VT_HP) &&
-           VerifyField<uint32_t>(verifier, VT_MANA) &&
-           verifier.EndTable();
-  }
-};
+		public:
+			Vec3()
+				: x_(0),
+				y_(0),
+				z_(0) {
+			}
+			Vec3(float _x, float _y, float _z)
+				: x_(flatbuffers::EndianScalar(_x)),
+				y_(flatbuffers::EndianScalar(_y)),
+				z_(flatbuffers::EndianScalar(_z)) {
+			}
+			float x() const {
+				return flatbuffers::EndianScalar(x_);
+			}
+			float y() const {
+				return flatbuffers::EndianScalar(y_);
+			}
+			float z() const {
+				return flatbuffers::EndianScalar(z_);
+			}
+		};
+		FLATBUFFERS_STRUCT_END(Vec3, 12);
 
-struct PlayerBuilder {
-  typedef Player Table;
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
-    fbb_.AddOffset(Player::VT_NAME, name);
-  }
-  void add_pos(const Eater::PlayerData::Vec3 *pos) {
-    fbb_.AddStruct(Player::VT_POS, pos);
-  }
-  void add_mov_vector(const Eater::PlayerData::Vec3 *mov_vector) {
-    fbb_.AddStruct(Player::VT_MOV_VECTOR, mov_vector);
-  }
-  void add_hp(uint32_t hp) {
-    fbb_.AddElement<uint32_t>(Player::VT_HP, hp, 0);
-  }
-  void add_mana(uint32_t mana) {
-    fbb_.AddElement<uint32_t>(Player::VT_MANA, mana, 0);
-  }
-  explicit PlayerBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  flatbuffers::Offset<Player> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<Player>(end);
-    return o;
-  }
-};
+		struct PlayerList FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+			typedef PlayerListBuilder Builder;
+			enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+				VT_PLAYERS = 4
+			};
+			const flatbuffers::Vector<flatbuffers::Offset<Eater::PlayerData::Player>>* players() const {
+				return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Eater::PlayerData::Player>>*>(VT_PLAYERS);
+			}
+			bool Verify(flatbuffers::Verifier& verifier) const {
+				return VerifyTableStart(verifier) &&
+					VerifyOffset(verifier, VT_PLAYERS) &&
+					verifier.VerifyVector(players()) &&
+					verifier.VerifyVectorOfTables(players()) &&
+					verifier.EndTable();
+			}
+		};
 
-inline flatbuffers::Offset<Player> CreatePlayer(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::String> name = 0,
-    const Eater::PlayerData::Vec3 *pos = 0,
-    const Eater::PlayerData::Vec3 *mov_vector = 0,
-    uint32_t hp = 0,
-    uint32_t mana = 0) {
-  PlayerBuilder builder_(_fbb);
-  builder_.add_mana(mana);
-  builder_.add_hp(hp);
-  builder_.add_mov_vector(mov_vector);
-  builder_.add_pos(pos);
-  builder_.add_name(name);
-  return builder_.Finish();
-}
+		struct PlayerListBuilder {
+			typedef PlayerList Table;
+			flatbuffers::FlatBufferBuilder& fbb_;
+			flatbuffers::uoffset_t start_;
+			void add_players(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Eater::PlayerData::Player>>> players) {
+				fbb_.AddOffset(PlayerList::VT_PLAYERS, players);
+			}
+			explicit PlayerListBuilder(flatbuffers::FlatBufferBuilder& _fbb)
+				: fbb_(_fbb) {
+				start_ = fbb_.StartTable();
+			}
+			flatbuffers::Offset<PlayerList> Finish() {
+				const auto end = fbb_.EndTable(start_);
+				auto o = flatbuffers::Offset<PlayerList>(end);
+				return o;
+			}
+		};
 
-inline flatbuffers::Offset<Player> CreatePlayerDirect(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    const char *name = nullptr,
-    const Eater::PlayerData::Vec3 *pos = 0,
-    const Eater::PlayerData::Vec3 *mov_vector = 0,
-    uint32_t hp = 0,
-    uint32_t mana = 0) {
-  auto name__ = name ? _fbb.CreateString(name) : 0;
-  return Eater::PlayerData::CreatePlayer(
-      _fbb,
-      name__,
-      pos,
-      mov_vector,
-      hp,
-      mana);
-}
+		inline flatbuffers::Offset<PlayerList> CreatePlayerList(
+			flatbuffers::FlatBufferBuilder& _fbb,
+			flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Eater::PlayerData::Player>>> players = 0) {
+			PlayerListBuilder builder_(_fbb);
+			builder_.add_players(players);
+			return builder_.Finish();
+		}
 
-inline const Eater::PlayerData::Player *GetPlayer(const void *buf) {
-  return flatbuffers::GetRoot<Eater::PlayerData::Player>(buf);
-}
+		inline flatbuffers::Offset<PlayerList> CreatePlayerListDirect(
+			flatbuffers::FlatBufferBuilder& _fbb,
+			const std::vector<flatbuffers::Offset<Eater::PlayerData::Player>>* players = nullptr) {
+			auto players__ = players ? _fbb.CreateVector<flatbuffers::Offset<Eater::PlayerData::Player>>(*players) : 0;
+			return Eater::PlayerData::CreatePlayerList(
+				_fbb,
+				players__);
+		}
 
-inline const Eater::PlayerData::Player *GetSizePrefixedPlayer(const void *buf) {
-  return flatbuffers::GetSizePrefixedRoot<Eater::PlayerData::Player>(buf);
-}
+		struct Player FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+			typedef PlayerBuilder Builder;
+			enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+				VT_IDENTIFIER = 4,
+				VT_POS = 6,
+				VT_MOV_VECTOR = 8,
+				VT_HP = 10
+			};
+			int16_t identifier() const {
+				return GetField<int16_t>(VT_IDENTIFIER, 0);
+			}
+			const Eater::PlayerData::Vec3* pos() const {
+				return GetStruct<const Eater::PlayerData::Vec3*>(VT_POS);
+			}
+			const Eater::PlayerData::Vec3* mov_vector() const {
+				return GetStruct<const Eater::PlayerData::Vec3*>(VT_MOV_VECTOR);
+			}
+			uint32_t hp() const {
+				return GetField<uint32_t>(VT_HP, 0);
+			}
+			bool Verify(flatbuffers::Verifier& verifier) const {
+				return VerifyTableStart(verifier) &&
+					VerifyField<int16_t>(verifier, VT_IDENTIFIER) &&
+					VerifyField<Eater::PlayerData::Vec3>(verifier, VT_POS) &&
+					VerifyField<Eater::PlayerData::Vec3>(verifier, VT_MOV_VECTOR) &&
+					VerifyField<uint32_t>(verifier, VT_HP) &&
+					verifier.EndTable();
+			}
+		};
 
-inline bool VerifyPlayerBuffer(
-    flatbuffers::Verifier &verifier) {
-  return verifier.VerifyBuffer<Eater::PlayerData::Player>(nullptr);
-}
+		struct PlayerBuilder {
+			typedef Player Table;
+			flatbuffers::FlatBufferBuilder& fbb_;
+			flatbuffers::uoffset_t start_;
+			void add_identifier(int16_t identifier) {
+				fbb_.AddElement<int16_t>(Player::VT_IDENTIFIER, identifier, 0);
+			}
+			void add_pos(const Eater::PlayerData::Vec3* pos) {
+				fbb_.AddStruct(Player::VT_POS, pos);
+			}
+			void add_mov_vector(const Eater::PlayerData::Vec3* mov_vector) {
+				fbb_.AddStruct(Player::VT_MOV_VECTOR, mov_vector);
+			}
+			void add_hp(uint32_t hp) {
+				fbb_.AddElement<uint32_t>(Player::VT_HP, hp, 0);
+			}
+			explicit PlayerBuilder(flatbuffers::FlatBufferBuilder& _fbb)
+				: fbb_(_fbb) {
+				start_ = fbb_.StartTable();
+			}
+			flatbuffers::Offset<Player> Finish() {
+				const auto end = fbb_.EndTable(start_);
+				auto o = flatbuffers::Offset<Player>(end);
+				return o;
+			}
+		};
 
-inline bool VerifySizePrefixedPlayerBuffer(
-    flatbuffers::Verifier &verifier) {
-  return verifier.VerifySizePrefixedBuffer<Eater::PlayerData::Player>(nullptr);
-}
+		inline flatbuffers::Offset<Player> CreatePlayer(
+			flatbuffers::FlatBufferBuilder& _fbb,
+			int16_t identifier = 0,
+			const Eater::PlayerData::Vec3* pos = 0,
+			const Eater::PlayerData::Vec3* mov_vector = 0,
+			uint32_t hp = 0) {
+			PlayerBuilder builder_(_fbb);
+			builder_.add_hp(hp);
+			builder_.add_mov_vector(mov_vector);
+			builder_.add_pos(pos);
+			builder_.add_identifier(identifier);
+			return builder_.Finish();
+		}
 
-inline void FinishPlayerBuffer(
-    flatbuffers::FlatBufferBuilder &fbb,
-    flatbuffers::Offset<Eater::PlayerData::Player> root) {
-  fbb.Finish(root);
-}
+		// 테스트용 추가
 
-inline void FinishSizePrefixedPlayerBuffer(
-    flatbuffers::FlatBufferBuilder &fbb,
-    flatbuffers::Offset<Eater::PlayerData::Player> root) {
-  fbb.FinishSizePrefixed(root);
-}
+		inline const Eater::PlayerData::Player* GetPlayer(const void* buf) {
+			return flatbuffers::GetRoot<Eater::PlayerData::Player>(buf);
+		}
 
-}  // namespace PlayerData
+		inline const Eater::PlayerData::Player* GetSizePrefixedPlayer(const void* buf) {
+			return flatbuffers::GetSizePrefixedRoot<Eater::PlayerData::Player>(buf);
+		}
+
+		inline bool VerifyPlayerBuffer(
+			flatbuffers::Verifier& verifier) {
+			return verifier.VerifyBuffer<Eater::PlayerData::Player>(nullptr);
+		}
+
+		inline bool VerifySizePrefixedPlayerBuffer(
+			flatbuffers::Verifier& verifier) {
+			return verifier.VerifySizePrefixedBuffer<Eater::PlayerData::Player>(nullptr);
+		}
+
+		inline void FinishPlayerBuffer(
+			flatbuffers::FlatBufferBuilder& fbb,
+			flatbuffers::Offset<Eater::PlayerData::Player> root) {
+			fbb.Finish(root);
+		}
+
+		inline void FinishSizePrefixedPlayerBuffer(
+			flatbuffers::FlatBufferBuilder& fbb,
+			flatbuffers::Offset<Eater::PlayerData::Player> root) {
+			fbb.FinishSizePrefixed(root);
+		}
+
+		//
+
+		inline const Eater::PlayerData::PlayerList* GetPlayerList(const void* buf) {
+			return flatbuffers::GetRoot<Eater::PlayerData::PlayerList>(buf);
+		}
+
+		inline const Eater::PlayerData::PlayerList* GetSizePrefixedPlayerList(const void* buf) {
+			return flatbuffers::GetSizePrefixedRoot<Eater::PlayerData::PlayerList>(buf);
+		}
+
+		inline bool VerifyPlayerListBuffer(
+			flatbuffers::Verifier& verifier) {
+			return verifier.VerifyBuffer<Eater::PlayerData::PlayerList>(nullptr);
+		}
+
+		inline bool VerifySizePrefixedPlayerListBuffer(
+			flatbuffers::Verifier& verifier) {
+			return verifier.VerifySizePrefixedBuffer<Eater::PlayerData::PlayerList>(nullptr);
+		}
+
+		inline void FinishPlayerListBuffer(
+			flatbuffers::FlatBufferBuilder& fbb,
+			flatbuffers::Offset<Eater::PlayerData::PlayerList> root) {
+			fbb.Finish(root);
+		}
+
+		inline void FinishSizePrefixedPlayerListBuffer(
+			flatbuffers::FlatBufferBuilder& fbb,
+			flatbuffers::Offset<Eater::PlayerData::PlayerList> root) {
+			fbb.FinishSizePrefixed(root);
+		}
+
+	}  // namespace PlayerData
 }  // namespace Eater
 
 #endif  // FLATBUFFERS_GENERATED_PLAYERDATA_EATER_PLAYERDATA_H_
