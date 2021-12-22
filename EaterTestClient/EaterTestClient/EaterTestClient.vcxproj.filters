@@ -10,4 +10,7 @@
       <Filter>Main</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\ImportLibrary\Inc\PlayerData_generated.h" />
+  </ItemGroup>
 </Project>

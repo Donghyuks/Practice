@@ -66,20 +66,32 @@ int main()
 					{
 						auto Player_Data = Player_List_Vector->Get(i);
 
-						printf_s("[Recv_Player_Position] x : %.2f, y : %.2f, z : %2.f", Player_Data->pos()->x(), Player_Data->pos()->y(), Player_Data->pos()->z());
+						if (EATER_PLAYER_01 == Player_Data->identifier())
+						{
+							printf_s("[PLAYER 1 Position] x : %.2f, y : %.2f, z : %2.f\n", Player_Data->pos()->x(), Player_Data->pos()->y(), Player_Data->pos()->z());
+						}
+						else if (EATER_PLAYER_02 == Player_Data->identifier())
+						{
+							printf_s("[PLAYER 2 Position] x : %.2f, y : %.2f, z : %2.f\n", Player_Data->pos()->x(), Player_Data->pos()->y(), Player_Data->pos()->z());
+						}
 					}
 
-
-					//const uint8_t* Recv_Data_Ptr = (unsigned char*)Recv_Packet->Packet_Buffer;
+					//// 메세지 보내기 테스트.
+					//flatbuffers::FlatBufferBuilder m_Builder;
 					//
-					//const Eater::PlayerData::Player* Recv_Player_Data = Eater::PlayerData::GetPlayer(Recv_Data_Ptr);
+					//auto _Pos = Eater::PlayerData::Vec3(1.f, 1.f, 1.f);
+					//auto _Mov_Vec = Eater::PlayerData::Vec3(-1.f, -1.f, -1.f);
 
-					//auto Hp = Recv_Player_Data->hp();
-					//auto Postion_Vector = Recv_Player_Data->pos();
-					//auto Mov_Vec = Recv_Player_Data->mov_vector();
+					//auto _Player_Data = Eater::PlayerData::CreatePlayer(m_Builder, EATER_PLAYER_01, &_Pos, &_Mov_Vec);
 
-					//std::cout << "HP : " << Hp << " Position : " << Postion_Vector->x() << ", " << Postion_Vector->y() << ", " << Postion_Vector->z();
-					//std::cout << " Mov_Vector : " << Mov_Vec->x() << ", " << Mov_Vec->y() << ", " << Mov_Vec->z() << std::endl;
+					//m_Builder.Finish(_Player_Data);
+
+					//// 패킷 헤더를 붙여 보내준다.
+					//Send_Packet->Packet_Type = C2S_PLAYER_MOVE_REQ;
+					//Send_Packet->Packet_Size = m_Builder.GetSize();
+					//memcpy_s(Send_Packet->Packet_Buffer, m_Builder.GetSize(), m_Builder.GetBufferPointer(), m_Builder.GetSize());
+
+					//my_NetWork->Send(Send_Packet);
 				}
 
 				delete S2C_Msg.Packet;
