@@ -1,0 +1,40 @@
+// LoginServer와 GameLauncher 사이의 패킷 데이터.
+
+// 데이터 형에 대한 정의
+// 8 bit: byte (int8), ubyte (uint8), bool
+// 16 bit: short (int16), ushort (uint16)
+// 32 bit: int (int32), uint (uint32), float (float32)
+// 64 bit: long (int64), ulong (uint64), double (float64)
+
+namespace Eater.LoginLauncher;
+
+// 로그인 정보 요청시 주고받을 구조체
+table LoginReqData
+{
+	id:string;
+	password:string;
+}
+
+
+table LoginResData
+{
+	result:ubyte;
+	key:uint;
+}
+
+// 일정주기로 보내줄 실시간 데이터
+table RealTimeData
+{
+	online:[string];
+	offline:[string];
+	ingame:[string];
+	inlobby:[string];
+	friendrequest:[string];
+}
+
+// 친구추가 요청 및 수락시 쓰일 데이터
+table AddFriend
+{
+	name:[string];
+}
+
