@@ -20,11 +20,15 @@
 
 class DHNetWorkAPI;
 class DHDB;
+class DHTimer;
 
 struct User_Data
 {
+	// Socket번호가 INVAILD 면 현재 Offline 이라는 뜻이다.
 	std::atomic<unsigned int> Socket_Num = INVALID_SOCKET;
+	std::atomic<unsigned int> User_State = USER_OFFLINE;
 	std::vector<std::string> Friend_List;
+	std::vector<std::string> Friend_Request_List;	// 추후구현..
 };
 
 class LoginManager
@@ -39,10 +43,15 @@ private:
 	// 로비 서버와 연결할 네트워크 (클라이언트로 생성)
 	DHNetWorkAPI* m_Connect_Lobby = nullptr;
 	// 로비 쪽과의 로직을 돌리기 위한 쓰레드
-	std::thread* m_Lobby_thread = nullptr;
+	std::thread* m_Lobby_Thread = nullptr;
+	// 일정 주기로 로직을 처리하기 위한 쓰레드
+	std::thread* m_Keep_Alive_Thread = nullptr;
 
 	/// DB 연결
 	DHDB* m_DB = nullptr;
+
+	/// Timer
+	DHTimer* m_Timer = nullptr;
 
 	/// 로직에 필요한 변수
 	// 로비랑 연결되었는지? (로비랑 연결이 안되어있다면 로그인서버는 동작하면 안된다.)
@@ -50,7 +59,7 @@ private:
 	// Recv 버퍼 비우기용
 	std::vector<Network_Message> Launcher_Msg_Vec;
 	std::vector<Network_Message> Lobby_Msg_Vec;
-	// Send 용 구조체 선언
+	// Send/Recv 용 구조체 선언
 	// Lobby
 	flatbuffers::FlatBufferBuilder Lobby_Builder;
 	S2C_Packet* Lobby_Recv_Packet = new S2C_Packet();
@@ -59,6 +68,10 @@ private:
 	flatbuffers::FlatBufferBuilder Launcher_Builder;
 	C2S_Packet* Launcher_Recv_Packet = new C2S_Packet();
 	S2C_Packet Launcher_Send_Packet;
+	// KeepAlive
+	flatbuffers::FlatBufferBuilder KeepAlive_Builder;
+	C2S_Packet* KeepAlive_Recv_Packet = new C2S_Packet();
+	S2C_Packet KeepAlive_Send_Packet;
 
 	/// 서버 정보관리
 	// 연결된 클라이언트을 파악하기 위함. (소켓에 해당하는 로그인된 아이디값을 저장해둔다)
@@ -67,6 +80,7 @@ private:
 
 private:
 	void LobbySideLogic();
+	void KeepAlive();
 	void Login_Certify(SOCKET _Socket_Num, C2S_Packet* _C2S_Msg);
 
 public:

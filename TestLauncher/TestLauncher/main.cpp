@@ -17,6 +17,13 @@ int main()
 	DHNetWorkAPI* my_NetWork = new DHNetWorkAPI();
 	my_NetWork->Initialize(DHNetWork_Name::DHNet, DHDEBUG_DETAIL);
 
+	printf_s("[LauncherTest] 아이디와 비밀번호를 입력해주세요.\n");
+
+	std::string _Input_ID;
+	std::string _Input_Password;
+
+	std::cin >> _Input_ID >> _Input_Password;
+
 	// 연결 대기
 	while (!my_NetWork->Connect(LOGIN_SERVER_PORT, CONNECT_IP));
 
@@ -25,8 +32,8 @@ int main()
 	// 메세지 보내기 테스트.
 	flatbuffers::FlatBufferBuilder m_Builder;
 	
-	auto _ID = m_Builder.CreateString("꼬부기");
-	auto _Password = m_Builder.CreateString("1234");
+	auto _ID = m_Builder.CreateString(_Input_ID);
+	auto _Password = m_Builder.CreateString(_Input_Password);
 
 	auto _Login_Data = Eater::LoginLauncher::CreateLoginReqData(m_Builder, _ID, _Password);
 
@@ -56,6 +63,24 @@ int main()
 					
 					auto _Login_Result = Recv_Login_Result->result();
 					auto _Login_Identifier = Recv_Login_Result->key();
+
+				}
+				else if (Recv_Packet->Packet_Type == S2C_KEEP_ALIVE_CHECK_REQ)
+				{
+					const uint8_t* Recv_Data_Ptr = (unsigned char*)Recv_Packet->Packet_Buffer;
+
+					const auto Recv_Login_Result = flatbuffers::GetRoot<Eater::LoginLauncher::RealTimeData>(Recv_Data_Ptr);
+
+					auto Recv_Friend_State_Vector = Recv_Login_Result->friendstate();
+
+					for (int i = 0; i < Recv_Friend_State_Vector->size(); i++)
+					{
+						auto Friend_Data = Recv_Friend_State_Vector->Get(i);
+
+						auto _User_ID = Friend_Data->id()->str();
+
+						printf_s("등록된 친구%d : %s \n",i, _User_ID.c_str());
+					}
 
 				}
 

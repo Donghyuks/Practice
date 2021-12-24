@@ -13,6 +13,11 @@
 #define LOGIN_PASSWORD_FAIL			0b0010
 #define LOGIN_SUCCESS				0b0100
 
+#define USER_OFFLINE				0b0000
+#define USER_ONLINE					0b0010
+#define USER_IN_LOBBY				0b0100
+#define USER_IN_GAME				0b1000
+
 // Client To Server
 #define	C2S_KEEP_ALIVE_CHECK_RES	5001
 #define	C2S_LOGIN_SAFE_REQ			5002

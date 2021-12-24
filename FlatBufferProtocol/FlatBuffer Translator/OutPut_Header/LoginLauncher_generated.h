@@ -9,6 +9,9 @@
 namespace Eater {
 namespace LoginLauncher {
 
+struct UserState;
+struct UserStateBuilder;
+
 struct LoginReqData;
 struct LoginReqDataBuilder;
 
@@ -20,6 +23,69 @@ struct RealTimeDataBuilder;
 
 struct AddFriend;
 struct AddFriendBuilder;
+
+struct UserState FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef UserStateBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_STATE = 4,
+    VT_ID = 6
+  };
+  uint8_t state() const {
+    return GetField<uint8_t>(VT_STATE, 0);
+  }
+  const flatbuffers::String *id() const {
+    return GetPointer<const flatbuffers::String *>(VT_ID);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_STATE) &&
+           VerifyOffset(verifier, VT_ID) &&
+           verifier.VerifyString(id()) &&
+           verifier.EndTable();
+  }
+};
+
+struct UserStateBuilder {
+  typedef UserState Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_state(uint8_t state) {
+    fbb_.AddElement<uint8_t>(UserState::VT_STATE, state, 0);
+  }
+  void add_id(flatbuffers::Offset<flatbuffers::String> id) {
+    fbb_.AddOffset(UserState::VT_ID, id);
+  }
+  explicit UserStateBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<UserState> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<UserState>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<UserState> CreateUserState(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    uint8_t state = 0,
+    flatbuffers::Offset<flatbuffers::String> id = 0) {
+  UserStateBuilder builder_(_fbb);
+  builder_.add_id(id);
+  builder_.add_state(state);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<UserState> CreateUserStateDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    uint8_t state = 0,
+    const char *id = nullptr) {
+  auto id__ = id ? _fbb.CreateString(id) : 0;
+  return Eater::LoginLauncher::CreateUserState(
+      _fbb,
+      state,
+      id__);
+}
 
 struct LoginReqData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef LoginReqDataBuilder Builder;
@@ -140,41 +206,20 @@ inline flatbuffers::Offset<LoginResData> CreateLoginResData(
 struct RealTimeData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef RealTimeDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_ONLINE = 4,
-    VT_OFFLINE = 6,
-    VT_INGAME = 8,
-    VT_INLOBBY = 10,
-    VT_FRIENDREQUEST = 12
+    VT_FRIENDSTATE = 4,
+    VT_FRIENDREQUEST = 6
   };
-  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *online() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_ONLINE);
-  }
-  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *offline() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_OFFLINE);
-  }
-  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *ingame() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_INGAME);
-  }
-  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *inlobby() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_INLOBBY);
+  const flatbuffers::Vector<flatbuffers::Offset<Eater::LoginLauncher::UserState>> *friendstate() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Eater::LoginLauncher::UserState>> *>(VT_FRIENDSTATE);
   }
   const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *friendrequest() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_FRIENDREQUEST);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_ONLINE) &&
-           verifier.VerifyVector(online()) &&
-           verifier.VerifyVectorOfStrings(online()) &&
-           VerifyOffset(verifier, VT_OFFLINE) &&
-           verifier.VerifyVector(offline()) &&
-           verifier.VerifyVectorOfStrings(offline()) &&
-           VerifyOffset(verifier, VT_INGAME) &&
-           verifier.VerifyVector(ingame()) &&
-           verifier.VerifyVectorOfStrings(ingame()) &&
-           VerifyOffset(verifier, VT_INLOBBY) &&
-           verifier.VerifyVector(inlobby()) &&
-           verifier.VerifyVectorOfStrings(inlobby()) &&
+           VerifyOffset(verifier, VT_FRIENDSTATE) &&
+           verifier.VerifyVector(friendstate()) &&
+           verifier.VerifyVectorOfTables(friendstate()) &&
            VerifyOffset(verifier, VT_FRIENDREQUEST) &&
            verifier.VerifyVector(friendrequest()) &&
            verifier.VerifyVectorOfStrings(friendrequest()) &&
@@ -186,17 +231,8 @@ struct RealTimeDataBuilder {
   typedef RealTimeData Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_online(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> online) {
-    fbb_.AddOffset(RealTimeData::VT_ONLINE, online);
-  }
-  void add_offline(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> offline) {
-    fbb_.AddOffset(RealTimeData::VT_OFFLINE, offline);
-  }
-  void add_ingame(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> ingame) {
-    fbb_.AddOffset(RealTimeData::VT_INGAME, ingame);
-  }
-  void add_inlobby(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> inlobby) {
-    fbb_.AddOffset(RealTimeData::VT_INLOBBY, inlobby);
+  void add_friendstate(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Eater::LoginLauncher::UserState>>> friendstate) {
+    fbb_.AddOffset(RealTimeData::VT_FRIENDSTATE, friendstate);
   }
   void add_friendrequest(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> friendrequest) {
     fbb_.AddOffset(RealTimeData::VT_FRIENDREQUEST, friendrequest);
@@ -214,38 +250,23 @@ struct RealTimeDataBuilder {
 
 inline flatbuffers::Offset<RealTimeData> CreateRealTimeData(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> online = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> offline = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> ingame = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> inlobby = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Eater::LoginLauncher::UserState>>> friendstate = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> friendrequest = 0) {
   RealTimeDataBuilder builder_(_fbb);
   builder_.add_friendrequest(friendrequest);
-  builder_.add_inlobby(inlobby);
-  builder_.add_ingame(ingame);
-  builder_.add_offline(offline);
-  builder_.add_online(online);
+  builder_.add_friendstate(friendstate);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<RealTimeData> CreateRealTimeDataDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<flatbuffers::Offset<flatbuffers::String>> *online = nullptr,
-    const std::vector<flatbuffers::Offset<flatbuffers::String>> *offline = nullptr,
-    const std::vector<flatbuffers::Offset<flatbuffers::String>> *ingame = nullptr,
-    const std::vector<flatbuffers::Offset<flatbuffers::String>> *inlobby = nullptr,
+    const std::vector<flatbuffers::Offset<Eater::LoginLauncher::UserState>> *friendstate = nullptr,
     const std::vector<flatbuffers::Offset<flatbuffers::String>> *friendrequest = nullptr) {
-  auto online__ = online ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*online) : 0;
-  auto offline__ = offline ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*offline) : 0;
-  auto ingame__ = ingame ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*ingame) : 0;
-  auto inlobby__ = inlobby ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*inlobby) : 0;
+  auto friendstate__ = friendstate ? _fbb.CreateVector<flatbuffers::Offset<Eater::LoginLauncher::UserState>>(*friendstate) : 0;
   auto friendrequest__ = friendrequest ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*friendrequest) : 0;
   return Eater::LoginLauncher::CreateRealTimeData(
       _fbb,
-      online__,
-      offline__,
-      ingame__,
-      inlobby__,
+      friendstate__,
       friendrequest__);
 }
 
