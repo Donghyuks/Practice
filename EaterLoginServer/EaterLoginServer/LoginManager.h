@@ -25,8 +25,8 @@ class DHTimer;
 struct User_Data
 {
 	// Socket번호가 INVAILD 면 현재 Offline 이라는 뜻이다.
-	std::atomic<unsigned int> Socket_Num = INVALID_SOCKET;
-	std::atomic<unsigned int> User_State = USER_OFFLINE;
+	std::atomic<int>			Socket_Num = INVALID_SOCKET;
+	std::atomic<unsigned int>	User_State = USER_OFFLINE;
 	std::vector<std::string> Friend_List;
 	std::vector<std::string> Friend_Request_List;	// 추후구현..
 };
@@ -77,11 +77,11 @@ private:
 	// 연결된 클라이언트을 파악하기 위함. (소켓에 해당하는 로그인된 아이디값을 저장해둔다)
 	std::map<std::string, User_Data*> Logged_In_User_Data;
 
-
 private:
 	void LobbySideLogic();
 	void KeepAlive();
 	void Login_Certify(SOCKET _Socket_Num, C2S_Packet* _C2S_Msg);
+	void Create_User(SOCKET _Socket_Num, C2S_Packet* _C2S_Msg);
 
 public:
 	LoginManager();

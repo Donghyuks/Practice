@@ -30,7 +30,7 @@
     <ClInclude Include="..\ImportLibrary\Inc\LauncherLoginPacketDefine.h">
       <Filter>PacketData</Filter>
     </ClInclude>
-    <ClInclude Include="PortIPDefine.h">
+    <ClInclude Include="..\ImportLibrary\Inc\PortIPDefine.h">
       <Filter>PacketData</Filter>
     </ClInclude>
   </ItemGroup>

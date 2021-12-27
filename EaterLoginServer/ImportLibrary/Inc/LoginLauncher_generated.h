@@ -24,6 +24,9 @@ struct RealTimeDataBuilder;
 struct AddFriend;
 struct AddFriendBuilder;
 
+struct CreateUser;
+struct CreateUserBuilder;
+
 struct UserState FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef UserStateBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -320,6 +323,71 @@ inline flatbuffers::Offset<AddFriend> CreateAddFriendDirect(
   return Eater::LoginLauncher::CreateAddFriend(
       _fbb,
       name__);
+}
+
+struct CreateUser FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef CreateUserBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_ID = 4,
+    VT_PASSWORD = 6
+  };
+  const flatbuffers::String *id() const {
+    return GetPointer<const flatbuffers::String *>(VT_ID);
+  }
+  const flatbuffers::String *password() const {
+    return GetPointer<const flatbuffers::String *>(VT_PASSWORD);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_ID) &&
+           verifier.VerifyString(id()) &&
+           VerifyOffset(verifier, VT_PASSWORD) &&
+           verifier.VerifyString(password()) &&
+           verifier.EndTable();
+  }
+};
+
+struct CreateUserBuilder {
+  typedef CreateUser Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_id(flatbuffers::Offset<flatbuffers::String> id) {
+    fbb_.AddOffset(CreateUser::VT_ID, id);
+  }
+  void add_password(flatbuffers::Offset<flatbuffers::String> password) {
+    fbb_.AddOffset(CreateUser::VT_PASSWORD, password);
+  }
+  explicit CreateUserBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<CreateUser> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<CreateUser>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<CreateUser> CreateCreateUser(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> id = 0,
+    flatbuffers::Offset<flatbuffers::String> password = 0) {
+  CreateUserBuilder builder_(_fbb);
+  builder_.add_password(password);
+  builder_.add_id(id);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<CreateUser> CreateCreateUserDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *id = nullptr,
+    const char *password = nullptr) {
+  auto id__ = id ? _fbb.CreateString(id) : 0;
+  auto password__ = password ? _fbb.CreateString(password) : 0;
+  return Eater::LoginLauncher::CreateCreateUser(
+      _fbb,
+      id__,
+      password__);
 }
 
 }  // namespace LoginLauncher

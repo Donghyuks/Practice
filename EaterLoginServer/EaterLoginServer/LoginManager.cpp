@@ -19,7 +19,7 @@ LoginManager::LoginManager()
 	Is_Connect_Lobby = true;
 
 	m_DB = new DHDB();
-	m_DB->ConnectDB("221.163.91.100", "CDH", "ehxk2Rnfwoa!", "LOGIN", DATABASE_PORT);
+	m_DB->ConnectDB(SERVER_CONNECT_IP, "CDH", "ehxk2Rnfwoa!", "LOGIN", DATABASE_PORT);
 	// 로비 로직을 실행하기위한 쓰레드 생성
 	m_Lobby_Thread = new std::thread(std::bind(&LoginManager::LobbySideLogic, this));
 
@@ -60,6 +60,16 @@ void LoginManager::LauncherSideLogic()
 					// 로그인 인증절차.
 					Login_Certify(_Recv_Socket_Num, C2S_Msg);
 				}
+				else if (C2S_Msg->Packet_Type == C2S_CREATE_USER_REQ)
+				{
+					// 아이디 생성에 대한 요청.
+					Create_User(_Recv_Socket_Num, C2S_Msg);
+				}
+				else if (C2S_KEEP_ALIVE_CHECK_RES)
+				{
+					// 현재 정상 연결중.. 추후 처리가 필요하다면 이부분을 고친다..
+					// 일단 현재는 Send 실패시 클라이언트가 강제종료했다고 간주.
+				}
 
 				// 사용한데이터 해제.
 				delete Msg_Packet.Packet;
@@ -92,6 +102,9 @@ void LoginManager::KeepAlive()
 		// 설정한시간 이 되었을경우
 		if (m_Timer->Ready_Frame())
 		{
+			/// 추후 친구 요청 구현시.. DB에서 정보를 업데이트해줘야 될 부분.
+			// m_DB->GetFriendList() ...
+
 			EnterCriticalSection(&g_CS);
 			// 한번이라도 접속한 유저들에 대해서 친구정보를 업데이트 해준다.
 			for (auto& _User_Data : Logged_In_User_Data)
@@ -142,7 +155,7 @@ void LoginManager::KeepAlive()
 				_friend_request_list.clear();
 			}
 
-			// 추후 친구요청 데이터 구현시, 이부분에서 추가해서 같이 보내준다.
+			/// 추후 친구요청 데이터 구현시, 이부분에서 추가해서 같이 보내준다.
 			//...
 			LeaveCriticalSection(&g_CS);
 
@@ -169,6 +182,26 @@ void LoginManager::Login_Certify(SOCKET _Socket_Num, C2S_Packet* _C2S_Msg)
 	Launcher_Send_Packet.Packet_Type = S2C_LOGIN_SAFE_RES;
 	flatbuffers::Offset<Eater::LoginLauncher::LoginResData> Send_LoginResData;
 
+	// 이미 로그인이 되어있는경우에는 이미 로그인되었다는 정보를 알려준다.
+	if (Logged_In_User_Data.find(Login_ID) != Logged_In_User_Data.end())
+	{
+		if (Logged_In_User_Data[Login_ID]->Socket_Num != INVALID_SOCKET)
+		{
+			Send_LoginResData = Eater::LoginLauncher::CreateLoginResData(Launcher_Builder, LOGIN_ALREADY_FAIL, 0);
+
+			// 데이터 직렬화
+			Launcher_Builder.Finish(Send_LoginResData);
+			Launcher_Send_Packet.Packet_Size = Launcher_Builder.GetSize();
+			memcpy_s(Launcher_Send_Packet.Packet_Buffer, Launcher_Builder.GetSize(), Launcher_Builder.GetBufferPointer(), Launcher_Builder.GetSize());
+
+			// 해당 패킷을 보냄.
+			m_Connect_Launcher->Send(&Launcher_Send_Packet, SEND_TYPE_TARGET, _Socket_Num);
+
+			Launcher_Builder.Clear();
+			return;
+		}
+	}
+
 	if (m_DB->SearchID(Login_ID))
 	{
 		// 아이디 O 패스워드 O (success)
@@ -181,13 +214,13 @@ void LoginManager::Login_Certify(SOCKET _Socket_Num, C2S_Packet* _C2S_Msg)
 		// 아이디 O 패스워드 X
 		else
 		{
-			Send_LoginResData = Eater::LoginLauncher::CreateLoginResData(Launcher_Builder, LOGIN_PASSWORD_FAIL, m_DB->GetIdentifier(Login_ID));
+			Send_LoginResData = Eater::LoginLauncher::CreateLoginResData(Launcher_Builder, LOGIN_PASSWORD_FAIL, 0);
 		}
 	}
 	// 아이디 X 패드워드 X
 	else
 	{
-		Send_LoginResData = Eater::LoginLauncher::CreateLoginResData(Launcher_Builder, LOGIN_ID_FAIL, m_DB->GetIdentifier(Login_ID));
+		Send_LoginResData = Eater::LoginLauncher::CreateLoginResData(Launcher_Builder, LOGIN_ID_FAIL, 0);
 	}
 
 	// 데이터 직렬화
@@ -221,7 +254,44 @@ void LoginManager::Login_Certify(SOCKET _Socket_Num, C2S_Packet* _C2S_Msg)
 		{
 			// 이미 존재하는 유저라면 (해당 유저의 소켓정보를 업데이트 해준다.)
 			User_Init->second->Socket_Num.exchange(_Socket_Num);
+			User_Init->second->User_State.exchange(USER_ONLINE);
 		}
 
 	}
+}
+
+void LoginManager::Create_User(SOCKET _Socket_Num, C2S_Packet* _C2S_Msg)
+{
+	// 받은 데이터를 flatbuffer 에 맞게 캐스팅
+	const uint8_t* Recv_Data_Ptr = (unsigned char*)_C2S_Msg->Packet_Buffer;
+	const auto Recv_CreateUserData = flatbuffers::GetRoot<Eater::LoginLauncher::CreateUser>(Recv_Data_Ptr);
+
+	// 클라이언트에서 로그인 시도한 아이디와 패스워드.
+	auto User_ID = Recv_CreateUserData->id()->str();
+	auto User_Password = Recv_CreateUserData->password()->str();
+
+	// DB에 유저 정보가 존재하는지 조회한다.
+	if (!m_DB->SearchID(User_ID))
+	{
+		if (m_DB->CreateNewAccount(User_ID, User_Password))
+		{
+			// 성공적으로 아이디를 생성했을 경우
+			Launcher_Send_Packet.Packet_Type = S2C_CREATE_USER_RES;
+			Launcher_Send_Packet.Packet_Buffer[0] = true;
+			Launcher_Send_Packet.Packet_Size = 1;
+
+			// 해당 패킷을 보냄.
+			m_Connect_Launcher->Send(&Launcher_Send_Packet, SEND_TYPE_TARGET, _Socket_Num);
+			return;
+		}
+	}
+
+	// 아이디가 정상적인 생성이 되지 않았으면 실패했다고 알려줌.
+	Launcher_Send_Packet.Packet_Type = S2C_CREATE_USER_RES;
+	Launcher_Send_Packet.Packet_Buffer[0] = false;
+	Launcher_Send_Packet.Packet_Size = 1;
+
+	// 해당 패킷을 보냄.
+	m_Connect_Launcher->Send(&Launcher_Send_Packet, SEND_TYPE_TARGET, _Socket_Num);
+	return;
 }

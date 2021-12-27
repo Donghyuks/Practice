@@ -41,3 +41,10 @@ table AddFriend
 	name:[string];
 }
 
+
+// 아이디 생성 요청
+table CreateUser
+{
+	id:string;
+	password:string;
+}
