@@ -4,6 +4,13 @@
 	#define DHKEY_DLL __declspec(dllexport)
 #else
 	#define DHKEY_DLL __declspec(dllimport)
+
+#ifdef _DEBUG
+#pragma comment(lib,"DHKeyIO_x64d")
+#else
+#pragma comment(lib,"DHKeyIO_x64r")
+#endif
+
 #endif
 
 struct DHKEY_DLL Key_Flag

@@ -1,0 +1,48 @@
+// Player 패킷 데이터.
+
+// 데이터 형에 대한 정의
+// 8 bit: byte (int8), ubyte (uint8), bool
+// 16 bit: short (int16), ushort (uint16)
+// 32 bit: int (int32), uint (uint32), float (float32)
+// 64 bit: long (int64), ulong (uint64), double (float64)
+
+namespace Eater.GameData;
+
+// 사용될 구조체들에 대한 정의
+
+// 3D 상의 Vector
+struct Vec3
+{
+	x:float;
+	y:float;
+	z:float;
+}
+
+// 실제 게임 데이터에 대한 정의
+
+table ClientStartInfo
+{
+	playerindex:ushort;		// 플레이어 번호
+	world_speed:double;		// 게임 내 속도
+	character_type:ushort;	// 캐릭터 종류
+}
+
+table ClientMove
+{
+	sequence:ushort;		// 시퀀스 번호
+	dtime:double;			// dtime
+	mov_vector:Vec3;		// Vector3 방향 벡터
+}
+
+table WorldData
+{
+	users:[UserData];		// UserData 벡터
+}
+
+table UserData
+{
+	playerindex:ushort;		// 플레이어 번호
+	animation:ushort;		// 현재 플레이어 Animation 상태
+	position:Vec3;			// 현재 플레이어의 위치
+	sequence:ushort;		// 시퀀스 번호
+}

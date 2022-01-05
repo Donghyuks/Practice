@@ -84,9 +84,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)_x64d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <TargetName>$(ProjectName)_x64r</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -143,7 +145,7 @@ mkdir "$(SolutionDir)lib\Debug"
 mkdir "$(SolutionDir)Inc"
 copy /Y "$(TargetDir)*.lib" "$(SolutionDir)lib\Debug"
 copy /Y "$(TargetDir)*.dll" "$(SolutionDir)lib\Debug"
-copy /Y "$(ProjectDir)$(TargetName).h" "$(SolutionDir)Inc"</Command>
+copy /Y "$(ProjectDir)DHKeyIO.h" "$(SolutionDir)Inc"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -171,7 +173,7 @@ mkdir "$(SolutionDir)lib\Release"
 mkdir "$(SolutionDir)Inc"
 copy /Y "$(TargetDir)*.lib" "$(SolutionDir)lib\Release"
 copy /Y "$(TargetDir)*.dll" "$(SolutionDir)lib\Release"
-copy /Y "$(ProjectDir)$(TargetName).h" "$(SolutionDir)Inc"</Command>
+copy /Y "$(ProjectDir)DHKeyIO.h" "$(SolutionDir)Inc"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

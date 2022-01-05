@@ -1,4 +1,4 @@
-// GameServer 와 GameClient 간의 패킷 데이터.
+usho// GameServer 와 GameClient 간의 패킷 데이터.
 // <시간>	 	세계시간 / 현재 웨이브 정보 / 낮과 밤.
 // <오브젝트>	 	맵에 존재하는 상호가능한 오브젝트에 대한 관리 데이터.
 // <플레이어>		Position / Velocity / Collision 등의 플레이어의 이동 및 상태에 영향을 주는 데이터를 주고받는다.

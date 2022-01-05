@@ -46,7 +46,8 @@ bool DHTimer::Ready_Frame(TIMER_NUM _Using_Timer /*= TIMER_01*/)
 {
 	if (m_Timer[_Using_Timer].Passed_Time.count() > m_Timer[_Using_Timer].Check_Cycle_Sec)
 	{
-		m_Timer[_Using_Timer].Passed_Time = std::chrono::duration<double>::zero();
+		m_Timer[_Using_Timer].Frame_Time	= m_Timer[_Using_Timer].Passed_Time;
+		m_Timer[_Using_Timer].Passed_Time	= std::chrono::duration<double>::zero();
 		return true;
 	}
 
@@ -59,4 +60,9 @@ double DHTimer::GetTotalPassedTimeSec()
 	Total_Passed_Time = _Current_Time - Start_Time;
 
 	return Total_Passed_Time.count();
+}
+
+double DHTimer::GetFrameTime(TIMER_NUM _Using_Timer /*= TIMER_01*/)
+{
+	return m_Timer[_Using_Timer].Frame_Time.count();
 }

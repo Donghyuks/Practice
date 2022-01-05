@@ -4,13 +4,23 @@
     <Filter Include="Main">
       <UniqueIdentifier>{c7e8f27a-088e-4e28-9a6d-433dc1616f09}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameManager">
+      <UniqueIdentifier>{0972b297-0cf5-444e-b1a6-49e870466837}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Main</Filter>
     </ClCompile>
+    <ClCompile Include="GameManager.cpp">
+      <Filter>GameManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ImportLibrary\Inc\PlayerData_generated.h" />
+    <ClInclude Include="GameManager.h">
+      <Filter>GameManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ImportLibrary\Inc\PortIPDefine.h" />
   </ItemGroup>
 </Project>

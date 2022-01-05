@@ -32,7 +32,9 @@ private:
 	{
 		// 검사할 주기(초단위)
 		double Check_Cycle_Sec = (double)1 / 60; // 기본값은 1초에 60프레임
-		std::chrono::duration<double> Passed_Time = std::chrono::duration<double>::zero();
+		std::chrono::duration<double> Passed_Time	= std::chrono::duration<double>::zero();
+		// Ready_Frame 을 호출 했을 당시에 걸린 시간 기록.
+		std::chrono::duration<double> Frame_Time	= std::chrono::duration<double>::zero();
 	};
 
 private:
@@ -57,6 +59,7 @@ public:
 	bool Ready_Frame(TIMER_NUM _Using_Timer = TIMER_01);
 	// 타이머가 시작되고 현재까지 진행된 총 시간 (초단위)
 	double GetTotalPassedTimeSec();
-
+	// 이번 프레임에 걸린 시간 (ms)
+	double GetFrameTime(TIMER_NUM _Using_Timer = TIMER_01);
 };
 
