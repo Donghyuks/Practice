@@ -112,7 +112,8 @@ struct ClientStat FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_PLAYERINDEX = 4,
     VT_WORLD_SPEED = 6,
-    VT_CHARACTER_TYPE = 8
+    VT_CHARACTER_TYPE = 8,
+    VT_WORLD_POSITION = 10
   };
   uint16_t playerindex() const {
     return GetField<uint16_t>(VT_PLAYERINDEX, 0);
@@ -123,11 +124,15 @@ struct ClientStat FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   uint16_t character_type() const {
     return GetField<uint16_t>(VT_CHARACTER_TYPE, 0);
   }
+  const Eater::GameData::Vec3 *world_position() const {
+    return GetStruct<const Eater::GameData::Vec3 *>(VT_WORLD_POSITION);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint16_t>(verifier, VT_PLAYERINDEX) &&
            VerifyField<double>(verifier, VT_WORLD_SPEED) &&
            VerifyField<uint16_t>(verifier, VT_CHARACTER_TYPE) &&
+           VerifyField<Eater::GameData::Vec3>(verifier, VT_WORLD_POSITION) &&
            verifier.EndTable();
   }
 };
@@ -145,6 +150,9 @@ struct ClientStatBuilder {
   void add_character_type(uint16_t character_type) {
     fbb_.AddElement<uint16_t>(ClientStat::VT_CHARACTER_TYPE, character_type, 0);
   }
+  void add_world_position(const Eater::GameData::Vec3 *world_position) {
+    fbb_.AddStruct(ClientStat::VT_WORLD_POSITION, world_position);
+  }
   explicit ClientStatBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -160,9 +168,11 @@ inline flatbuffers::Offset<ClientStat> CreateClientStat(
     flatbuffers::FlatBufferBuilder &_fbb,
     uint16_t playerindex = 0,
     double world_speed = 0.0,
-    uint16_t character_type = 0) {
+    uint16_t character_type = 0,
+    const Eater::GameData::Vec3 *world_position = 0) {
   ClientStatBuilder builder_(_fbb);
   builder_.add_world_speed(world_speed);
+  builder_.add_world_position(world_position);
   builder_.add_character_type(character_type);
   builder_.add_playerindex(playerindex);
   return builder_.Finish();

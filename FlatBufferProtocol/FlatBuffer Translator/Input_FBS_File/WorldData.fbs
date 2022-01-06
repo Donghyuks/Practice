@@ -30,6 +30,7 @@ table ClientStat
 	playerindex:ushort;		// 플레이어 번호
 	world_speed:double;		// 게임 내 속도
 	character_type:ushort;	// 캐릭터 종류
+	world_position:Vec3;	// 시작 위치
 }
 
 table ClientMove

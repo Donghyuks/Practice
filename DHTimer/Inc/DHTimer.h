@@ -31,7 +31,7 @@ private:
 	struct TIMER_DATA
 	{
 		// 검사할 주기(초단위)
-		double Check_Cycle_Sec = (double)1 / 60; // 기본값은 1초에 60프레임
+		double Check_Cycle_Sec = (double)1.f / (double)60.f; // 기본값은 1초에 60프레임
 		std::chrono::duration<double> Passed_Time	= std::chrono::duration<double>::zero();
 		// Ready_Frame 을 호출 했을 당시에 걸린 시간 기록.
 		std::chrono::duration<double> Frame_Time	= std::chrono::duration<double>::zero();

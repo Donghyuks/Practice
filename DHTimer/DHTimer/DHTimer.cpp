@@ -28,7 +28,7 @@ bool DHTimer::SetFrame(unsigned int _FPS, TIMER_NUM _Using_Timer /*= TIMER_01*/)
 {
 	if (_Using_Timer >= TIMER_COUNT) return false;
 
-	m_Timer[_Using_Timer].Check_Cycle_Sec = (double)1 / _FPS;
+	m_Timer[_Using_Timer].Check_Cycle_Sec = (double)1 / (double)_FPS;
 
 	return true;
 }
