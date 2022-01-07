@@ -22,5 +22,6 @@
       <Filter>GameManager</Filter>
     </ClInclude>
     <ClInclude Include="..\ImportLibrary\Inc\PortIPDefine.h" />
+    <ClInclude Include="..\ImportLibrary\Inc\GameClientGameServerPacketDefine.h" />
   </ItemGroup>
 </Project>

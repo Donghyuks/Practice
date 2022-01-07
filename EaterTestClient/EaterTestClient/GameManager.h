@@ -44,7 +44,7 @@ struct Player
 	unsigned short					m_Character = 0;
 	double							m_Speed = 0.f;
 	DirectX::SimpleMath::Vector3	m_Position;
-	DirectX::SimpleMath::Vector3	m_Prev_Position;		// 다른 클라이언트들의 보간을 위한 이전 포지션값.
+	DirectX::SimpleMath::Vector3	m_Prev_Position;			// 다른 클라이언트들의 보간을 위한 이전 포지션값.
 };
 
 struct FrameData
@@ -87,7 +87,7 @@ private:
 	Player* m_Player = nullptr;		// 현재 내가 무슨 플레이어인지
 	// 네트워크로부터 역할을 부여받았는가? (게임이 시작되었는가?)
 	bool m_Is_Start = false;
-	// 서버로 부터 지연시간
+	// 테스트..
 	double m_RTT = 0.f;
 	// 현재 클라이언트가 서버로부터 데이터를 받고 지난 시간
 	double m_Passed_Client_Time = 0.f;

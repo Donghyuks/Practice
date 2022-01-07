@@ -165,6 +165,12 @@ void GameManager::GameLoop()
 				// 서버에서 주기적으로 보내오는 World 상태.
 				if (Recv_Packet->Packet_Type == S2C_WORLD_UPDATE)
 				{
+					Current_Time = std::chrono::system_clock::now();
+
+					Passed_Time = Current_Time - Prev_Time;
+
+					Prev_Time = Current_Time;
+
 					// 서버로부터 데이터를 받았으므로, 대기시간 초기화.
 					m_Passed_Client_Time = 0.f;
 
@@ -346,6 +352,9 @@ void GameManager::GameLoop()
 	/// 3,4 보간을 적용한 후 랜더링.
 	MYD2D->StartRender();
 	MYD2D->thDrawText(10, 10, D2D1::ColorF(1.0f, 0.0f, 0.0f), L"Current FPS : %.2f Fps", (double)1 / m_Dtime );
+	MYD2D->thDrawText(10, 30, D2D1::ColorF(1.0f, 0.0f, 0.0f), L"Real RTT : %.2f s", Passed_Time.count());
+	MYD2D->thDrawText(10, 50, D2D1::ColorF(1.0f, 0.0f, 0.0f), L"Setting RTT : %.2f s", m_RTT );
+	MYD2D->thDrawText(10, 70, D2D1::ColorF(1.0f, 0.0f, 0.0f), L"Passed Client Time : %.2f s", m_Passed_Client_Time);
 
 	// 현재 플레이어를 제외한 상대유저는 RTT 를 고려하여 보간
 	for (auto _Other : m_Player_List)
@@ -361,7 +370,7 @@ void GameManager::GameLoop()
 		double _Interpolation = m_Passed_Client_Time / m_RTT;
 		if (_Interpolation >= 1.0f) _Interpolation = 1.0f;
 
-		_Interpolation_Pos = DirectX::SimpleMath::Vector3::SmoothStep(_Other_Player->m_Prev_Position, _Other_Player->m_Position, _Interpolation);
+		_Interpolation_Pos = DirectX::SimpleMath::Vector3::Lerp(_Other_Player->m_Prev_Position, _Other_Player->m_Position, _Interpolation);
 
 		if (_Other_Player->m_Animation == ANIMATION_IDLE)
 		{
