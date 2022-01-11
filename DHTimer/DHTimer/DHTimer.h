@@ -41,7 +41,8 @@ private:
 	// 사용가능한 타이머
 	TIMER_DATA m_Timer[TIMER_COUNT];
 
-	std::chrono::time_point<std::chrono::system_clock> Start_Time;									// 지난 프레임 시간
+	std::chrono::time_point<std::chrono::system_clock> Start_Time;	
+	// 지난 프레임 시간
 	std::chrono::time_point<std::chrono::system_clock> Prev_Time;									// 지난 프레임 시간
 	std::chrono::time_point<std::chrono::system_clock> Current_Time;								// 현재 프레임 시간
 	std::chrono::duration<double> Total_Passed_Time = std::chrono::duration<double>::zero();				// 지난시간
