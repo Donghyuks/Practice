@@ -174,11 +174,15 @@ struct GameData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef GameDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_DAY = 4,
-    VT_MANASPAWN = 6,
-    VT_ENEMYSPAWN = 8
+    VT_MANACOUNT = 6,
+    VT_MANASPAWN = 8,
+    VT_ENEMYSPAWN = 10
   };
   int8_t day() const {
     return GetField<int8_t>(VT_DAY, 0);
+  }
+  uint16_t manacount() const {
+    return GetField<uint16_t>(VT_MANACOUNT, 0);
   }
   const flatbuffers::Vector<flatbuffers::Offset<Eater::StartData::ManaPosition>> *manaspawn() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Eater::StartData::ManaPosition>> *>(VT_MANASPAWN);
@@ -189,6 +193,7 @@ struct GameData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int8_t>(verifier, VT_DAY) &&
+           VerifyField<uint16_t>(verifier, VT_MANACOUNT) &&
            VerifyOffset(verifier, VT_MANASPAWN) &&
            verifier.VerifyVector(manaspawn()) &&
            verifier.VerifyVectorOfTables(manaspawn()) &&
@@ -205,6 +210,9 @@ struct GameDataBuilder {
   flatbuffers::uoffset_t start_;
   void add_day(int8_t day) {
     fbb_.AddElement<int8_t>(GameData::VT_DAY, day, 0);
+  }
+  void add_manacount(uint16_t manacount) {
+    fbb_.AddElement<uint16_t>(GameData::VT_MANACOUNT, manacount, 0);
   }
   void add_manaspawn(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Eater::StartData::ManaPosition>>> manaspawn) {
     fbb_.AddOffset(GameData::VT_MANASPAWN, manaspawn);
@@ -226,11 +234,13 @@ struct GameDataBuilder {
 inline flatbuffers::Offset<GameData> CreateGameData(
     flatbuffers::FlatBufferBuilder &_fbb,
     int8_t day = 0,
+    uint16_t manacount = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Eater::StartData::ManaPosition>>> manaspawn = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Eater::StartData::EnemyPosition>>> enemyspawn = 0) {
   GameDataBuilder builder_(_fbb);
   builder_.add_enemyspawn(enemyspawn);
   builder_.add_manaspawn(manaspawn);
+  builder_.add_manacount(manacount);
   builder_.add_day(day);
   return builder_.Finish();
 }
@@ -238,6 +248,7 @@ inline flatbuffers::Offset<GameData> CreateGameData(
 inline flatbuffers::Offset<GameData> CreateGameDataDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     int8_t day = 0,
+    uint16_t manacount = 0,
     const std::vector<flatbuffers::Offset<Eater::StartData::ManaPosition>> *manaspawn = nullptr,
     const std::vector<flatbuffers::Offset<Eater::StartData::EnemyPosition>> *enemyspawn = nullptr) {
   auto manaspawn__ = manaspawn ? _fbb.CreateVector<flatbuffers::Offset<Eater::StartData::ManaPosition>>(*manaspawn) : 0;
@@ -245,6 +256,7 @@ inline flatbuffers::Offset<GameData> CreateGameDataDirect(
   return Eater::StartData::CreateGameData(
       _fbb,
       day,
+      manacount,
       manaspawn__,
       enemyspawn__);
 }
