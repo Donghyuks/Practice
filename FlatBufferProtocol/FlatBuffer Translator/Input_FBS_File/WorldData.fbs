@@ -43,6 +43,8 @@ table ClientMove
 table WorldData
 {
 	users:[UserData];		// UserData 벡터
+	enemies:[EnemyData];	// EnemyData 벡터
+	objects:[ObjectData];	// ObjectData 벡터
 }
 
 table UserData
@@ -51,4 +53,19 @@ table UserData
 	animation:ushort;		// 현재 플레이어 Animation 상태
 	position:Vec3;			// 현재 플레이어의 위치
 	sequence:ushort;		// 시퀀스 번호
+}
+
+table EnemyData
+{
+	index:ushort;			// 적 번호
+	animation:ushort;		// 애니메이션 상태
+	position:Vec3;			// 위치
+	mov_vector:Vec3;		// 방향 벡터
+}
+
+table ObjectData
+{
+	index:ushort;			// 오브젝트 번호
+	type:ushort;			// 타입
+	position:Vec3;			// 위치
 }

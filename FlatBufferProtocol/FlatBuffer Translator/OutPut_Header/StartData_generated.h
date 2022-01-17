@@ -265,7 +265,10 @@ struct UserData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef UserDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_KEY = 4,
-    VT_CHARACTER_TYPE = 6
+    VT_CHARACTER_TYPE = 6,
+    VT_PLAYER_INDEX = 8,
+    VT_POSITION = 10,
+    VT_SPEED = 12
   };
   uint32_t key() const {
     return GetField<uint32_t>(VT_KEY, 0);
@@ -273,10 +276,22 @@ struct UserData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   uint16_t character_type() const {
     return GetField<uint16_t>(VT_CHARACTER_TYPE, 0);
   }
+  uint16_t player_index() const {
+    return GetField<uint16_t>(VT_PLAYER_INDEX, 0);
+  }
+  const Eater::StartData::Vec3 *position() const {
+    return GetStruct<const Eater::StartData::Vec3 *>(VT_POSITION);
+  }
+  float speed() const {
+    return GetField<float>(VT_SPEED, 0.0f);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_KEY) &&
            VerifyField<uint16_t>(verifier, VT_CHARACTER_TYPE) &&
+           VerifyField<uint16_t>(verifier, VT_PLAYER_INDEX) &&
+           VerifyField<Eater::StartData::Vec3>(verifier, VT_POSITION) &&
+           VerifyField<float>(verifier, VT_SPEED) &&
            verifier.EndTable();
   }
 };
@@ -290,6 +305,15 @@ struct UserDataBuilder {
   }
   void add_character_type(uint16_t character_type) {
     fbb_.AddElement<uint16_t>(UserData::VT_CHARACTER_TYPE, character_type, 0);
+  }
+  void add_player_index(uint16_t player_index) {
+    fbb_.AddElement<uint16_t>(UserData::VT_PLAYER_INDEX, player_index, 0);
+  }
+  void add_position(const Eater::StartData::Vec3 *position) {
+    fbb_.AddStruct(UserData::VT_POSITION, position);
+  }
+  void add_speed(float speed) {
+    fbb_.AddElement<float>(UserData::VT_SPEED, speed, 0.0f);
   }
   explicit UserDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -305,9 +329,15 @@ struct UserDataBuilder {
 inline flatbuffers::Offset<UserData> CreateUserData(
     flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t key = 0,
-    uint16_t character_type = 0) {
+    uint16_t character_type = 0,
+    uint16_t player_index = 0,
+    const Eater::StartData::Vec3 *position = 0,
+    float speed = 0.0f) {
   UserDataBuilder builder_(_fbb);
+  builder_.add_speed(speed);
+  builder_.add_position(position);
   builder_.add_key(key);
+  builder_.add_player_index(player_index);
   builder_.add_character_type(character_type);
   return builder_.Finish();
 }

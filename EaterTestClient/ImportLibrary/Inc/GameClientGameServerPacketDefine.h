@@ -25,6 +25,12 @@
 #define ANIMATION_IDLE					30000	
 #define ANIMATION_RUN					30001	
 
+// Object Type
+#define EATER_OBJECT_MANA				40000
+
+// Enemy Type
+#define EATER_ENEMY_NORMAL				50000
+
 // Client To Server
 #define C2S_LOADING_COMPLETE_REQ		1
 #define C2S_PLAYER_MOVE					1001

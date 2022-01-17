@@ -17,7 +17,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\ImportLibrary\Inc\PlayerData_generated.h" />
     <ClInclude Include="GameManager.h">
       <Filter>GameManager</Filter>
     </ClInclude>

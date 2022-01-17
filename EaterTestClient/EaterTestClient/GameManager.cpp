@@ -52,10 +52,12 @@ HRESULT GameManager::Initialize(HINSTANCE hInstance)
 
 	if (!g_hwnd) return S_FALSE;
 
+	scanf_s("%d", &m_Key);
+
 	// 서버 연결..
 	m_Network = new DHNetWorkAPI();
 	m_Network->Initialize(DHNetWork_Name::DHNet);
-	while (!m_Network->Connect(GAME_SERVER_PORT, LOCAL_CONNECT_IP)) {};
+	while (!m_Network->Connect(GAME_SERVER_PORT_1, LOCAL_CONNECT_IP)) {};
 
 	// 그래픽스 엔진 초기화
 	MYD2D->Initialize(g_hwnd);
@@ -68,7 +70,8 @@ HRESULT GameManager::Initialize(HINSTANCE hInstance)
 
 	// 로딩완료
 	_Send_Packet->Packet_Type = C2S_LOADING_COMPLETE_REQ;
-	_Send_Packet->Packet_Size = 0;
+	_Send_Packet->Packet_Size = sizeof(m_Key);
+	memcpy_s(_Send_Packet->Packet_Buffer, sizeof(m_Key), &m_Key, sizeof(m_Key));
 	m_Network->Send(_Send_Packet);
 
 	return S_OK;
@@ -165,6 +168,9 @@ void GameManager::GameLoop()
 				// 서버에서 주기적으로 보내오는 World 상태.
 				if (Recv_Packet->Packet_Type == S2C_WORLD_UPDATE)
 				{
+					Enemy_List.clear();
+					Mana_List.clear();
+
 					Current_Time = std::chrono::system_clock::now();
 
 					Passed_Time = Current_Time - Prev_Time;
@@ -178,6 +184,27 @@ void GameManager::GameLoop()
 					const uint8_t* Recv_Data_Ptr = (unsigned char*)Recv_Packet->Packet_Buffer;
 					const Eater::GameData::WorldData* _Recv_Data = flatbuffers::GetRoot<Eater::GameData::WorldData>(Recv_Data_Ptr);
 
+					// 적에 대한 정보
+					auto _Enemy_Data = _Recv_Data->enemies();
+					for (int i = 0; i < _Enemy_Data->size(); i++)
+					{
+						auto _Enemy = _Enemy_Data->Get(i);
+						auto _Position = _Enemy->position();
+
+						Enemy_List.push_back({ _Enemy->index(), DirectX::SimpleMath::Vector3(_Position->x(), _Position->y(), _Position->z()) });
+					}
+
+					// 맵에 오브젝트 (마나석 정보)
+					auto _Object_Data = _Recv_Data->objects();
+					for (int i = 0; i < _Object_Data->size(); i++)
+					{
+						auto _Object = _Object_Data->Get(i);
+						auto _Position = _Object->position();
+
+						Mana_List.push_back({ _Object->index(), DirectX::SimpleMath::Vector3(_Position->x(), _Position->y(), _Position->z()) });
+					}
+					
+					// 유저정보에 대한 부분
 					auto _Players_Data = _Recv_Data->users();
 
 					for (int i = 0; i < _Players_Data->size(); i++)
@@ -355,6 +382,26 @@ void GameManager::GameLoop()
 	MYD2D->thDrawText(10, 30, D2D1::ColorF(1.0f, 0.0f, 0.0f), L"Real RTT : %.2f s", Passed_Time.count());
 	MYD2D->thDrawText(10, 50, D2D1::ColorF(1.0f, 0.0f, 0.0f), L"Setting RTT : %.2f s", m_RTT );
 	MYD2D->thDrawText(10, 70, D2D1::ColorF(1.0f, 0.0f, 0.0f), L"Passed Client Time : %.2f s", m_Passed_Client_Time);
+
+	// 마나스톤 그리기
+	for (auto _Mana_Stone : Mana_List)
+	{
+		// 2D 상 쉽게 보이기위해 보정
+		DirectX::SimpleMath::Vector3 _ADD_Pos(300, 0, 500);
+		DirectX::SimpleMath::Vector3 _Draw_Pos = _Mana_Stone.Position * 3 + _ADD_Pos;
+		MYD2D->thDrawText(_Draw_Pos.x, _Draw_Pos.z, D2D1::ColorF(0.0f, 0.0f, 0.0f), L"%d", _Mana_Stone.Index);
+		MYD2D->thDrawEllipse(_Draw_Pos.x, _Draw_Pos.z, 7, 1, D2D1::ColorF(0.0f, 0.0f, 1.0f));
+	}
+
+	// 적 그리기
+	for (auto _Enemy : Enemy_List)
+	{
+		// 2D 상 쉽게 보이기위해 보정
+		DirectX::SimpleMath::Vector3 _ADD_Pos(300, 0, 500);
+		DirectX::SimpleMath::Vector3 _Draw_Pos = _Enemy.Position * 3 + _ADD_Pos;
+		MYD2D->thDrawText(_Draw_Pos.x, _Draw_Pos.z, D2D1::ColorF(0.0f, 0.0f, 0.0f), L"%d", _Enemy.Index);
+		MYD2D->thDrawEllipse(_Draw_Pos.x, _Draw_Pos.z, 7, 1, D2D1::ColorF(1.0f, 0.0f, 1.0f));
+	}
 
 	// 현재 플레이어를 제외한 상대유저는 RTT 를 고려하여 보간
 	for (auto _Other : m_Player_List)

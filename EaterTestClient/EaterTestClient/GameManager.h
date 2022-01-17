@@ -13,6 +13,11 @@
 #include <queue>
 #include <chrono>
 
+// 디버그용 콘솔창
+#ifdef _DEBUG
+#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
+#endif
+
 using namespace std;
 
 // 싱글톤으로 생성한 D2D 엔진 쉽게 쓰려구
@@ -26,6 +31,18 @@ class DHTimer;
 class DHKeyIO;
 class DHNetWorkAPI;
 struct C2S_Packet;
+
+struct Enemy
+{
+	unsigned short	Index;
+	DirectX::SimpleMath::Vector3	Position;
+};
+
+struct ManaStone
+{
+	unsigned short	Index;
+	DirectX::SimpleMath::Vector3	Position;
+};
 
 struct Player
 {
@@ -72,8 +89,11 @@ private:
 	DHKeyIO* m_KeyIO = nullptr;
 	DHTimer* m_Timer = nullptr;
 
-	vector<Object*> Obj_List;
+	std::vector<Enemy> Enemy_List;
+	std::vector<ManaStone> Mana_List;
 
+	/// 추후 게임런처에서 자신의 Key 값을 알려줄 예정 현재는 임시로 Input을 받음
+	unsigned int m_Key = 0;
 	// 시작할때 서버에서 내가 무슨 플레이언지 알려줌
 	unsigned short m_Player_Number = 0;
 	// Dtime 기록.

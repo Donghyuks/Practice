@@ -26,6 +26,12 @@ struct WorldDataBuilder;
 struct UserData;
 struct UserDataBuilder;
 
+struct EnemyData;
+struct EnemyDataBuilder;
+
+struct ObjectData;
+struct ObjectDataBuilder;
+
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Vec3 FLATBUFFERS_FINAL_CLASS {
  private:
   float x_;
@@ -242,16 +248,30 @@ inline flatbuffers::Offset<ClientMove> CreateClientMove(
 struct WorldData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef WorldDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_USERS = 4
+    VT_USERS = 4,
+    VT_ENEMIES = 6,
+    VT_OBJECTS = 8
   };
   const flatbuffers::Vector<flatbuffers::Offset<Eater::GameData::UserData>> *users() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Eater::GameData::UserData>> *>(VT_USERS);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<Eater::GameData::EnemyData>> *enemies() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Eater::GameData::EnemyData>> *>(VT_ENEMIES);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<Eater::GameData::ObjectData>> *objects() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Eater::GameData::ObjectData>> *>(VT_OBJECTS);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_USERS) &&
            verifier.VerifyVector(users()) &&
            verifier.VerifyVectorOfTables(users()) &&
+           VerifyOffset(verifier, VT_ENEMIES) &&
+           verifier.VerifyVector(enemies()) &&
+           verifier.VerifyVectorOfTables(enemies()) &&
+           VerifyOffset(verifier, VT_OBJECTS) &&
+           verifier.VerifyVector(objects()) &&
+           verifier.VerifyVectorOfTables(objects()) &&
            verifier.EndTable();
   }
 };
@@ -262,6 +282,12 @@ struct WorldDataBuilder {
   flatbuffers::uoffset_t start_;
   void add_users(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Eater::GameData::UserData>>> users) {
     fbb_.AddOffset(WorldData::VT_USERS, users);
+  }
+  void add_enemies(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Eater::GameData::EnemyData>>> enemies) {
+    fbb_.AddOffset(WorldData::VT_ENEMIES, enemies);
+  }
+  void add_objects(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Eater::GameData::ObjectData>>> objects) {
+    fbb_.AddOffset(WorldData::VT_OBJECTS, objects);
   }
   explicit WorldDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -276,19 +302,29 @@ struct WorldDataBuilder {
 
 inline flatbuffers::Offset<WorldData> CreateWorldData(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Eater::GameData::UserData>>> users = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Eater::GameData::UserData>>> users = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Eater::GameData::EnemyData>>> enemies = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Eater::GameData::ObjectData>>> objects = 0) {
   WorldDataBuilder builder_(_fbb);
+  builder_.add_objects(objects);
+  builder_.add_enemies(enemies);
   builder_.add_users(users);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<WorldData> CreateWorldDataDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<flatbuffers::Offset<Eater::GameData::UserData>> *users = nullptr) {
+    const std::vector<flatbuffers::Offset<Eater::GameData::UserData>> *users = nullptr,
+    const std::vector<flatbuffers::Offset<Eater::GameData::EnemyData>> *enemies = nullptr,
+    const std::vector<flatbuffers::Offset<Eater::GameData::ObjectData>> *objects = nullptr) {
   auto users__ = users ? _fbb.CreateVector<flatbuffers::Offset<Eater::GameData::UserData>>(*users) : 0;
+  auto enemies__ = enemies ? _fbb.CreateVector<flatbuffers::Offset<Eater::GameData::EnemyData>>(*enemies) : 0;
+  auto objects__ = objects ? _fbb.CreateVector<flatbuffers::Offset<Eater::GameData::ObjectData>>(*objects) : 0;
   return Eater::GameData::CreateWorldData(
       _fbb,
-      users__);
+      users__,
+      enemies__,
+      objects__);
 }
 
 struct UserData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -359,6 +395,138 @@ inline flatbuffers::Offset<UserData> CreateUserData(
   builder_.add_sequence(sequence);
   builder_.add_animation(animation);
   builder_.add_playerindex(playerindex);
+  return builder_.Finish();
+}
+
+struct EnemyData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef EnemyDataBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_INDEX = 4,
+    VT_ANIMATION = 6,
+    VT_POSITION = 8,
+    VT_MOV_VECTOR = 10
+  };
+  uint16_t index() const {
+    return GetField<uint16_t>(VT_INDEX, 0);
+  }
+  uint16_t animation() const {
+    return GetField<uint16_t>(VT_ANIMATION, 0);
+  }
+  const Eater::GameData::Vec3 *position() const {
+    return GetStruct<const Eater::GameData::Vec3 *>(VT_POSITION);
+  }
+  const Eater::GameData::Vec3 *mov_vector() const {
+    return GetStruct<const Eater::GameData::Vec3 *>(VT_MOV_VECTOR);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_INDEX) &&
+           VerifyField<uint16_t>(verifier, VT_ANIMATION) &&
+           VerifyField<Eater::GameData::Vec3>(verifier, VT_POSITION) &&
+           VerifyField<Eater::GameData::Vec3>(verifier, VT_MOV_VECTOR) &&
+           verifier.EndTable();
+  }
+};
+
+struct EnemyDataBuilder {
+  typedef EnemyData Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_index(uint16_t index) {
+    fbb_.AddElement<uint16_t>(EnemyData::VT_INDEX, index, 0);
+  }
+  void add_animation(uint16_t animation) {
+    fbb_.AddElement<uint16_t>(EnemyData::VT_ANIMATION, animation, 0);
+  }
+  void add_position(const Eater::GameData::Vec3 *position) {
+    fbb_.AddStruct(EnemyData::VT_POSITION, position);
+  }
+  void add_mov_vector(const Eater::GameData::Vec3 *mov_vector) {
+    fbb_.AddStruct(EnemyData::VT_MOV_VECTOR, mov_vector);
+  }
+  explicit EnemyDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<EnemyData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<EnemyData>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<EnemyData> CreateEnemyData(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t index = 0,
+    uint16_t animation = 0,
+    const Eater::GameData::Vec3 *position = 0,
+    const Eater::GameData::Vec3 *mov_vector = 0) {
+  EnemyDataBuilder builder_(_fbb);
+  builder_.add_mov_vector(mov_vector);
+  builder_.add_position(position);
+  builder_.add_animation(animation);
+  builder_.add_index(index);
+  return builder_.Finish();
+}
+
+struct ObjectData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ObjectDataBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_INDEX = 4,
+    VT_TYPE = 6,
+    VT_POSITION = 8
+  };
+  uint16_t index() const {
+    return GetField<uint16_t>(VT_INDEX, 0);
+  }
+  uint16_t type() const {
+    return GetField<uint16_t>(VT_TYPE, 0);
+  }
+  const Eater::GameData::Vec3 *position() const {
+    return GetStruct<const Eater::GameData::Vec3 *>(VT_POSITION);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_INDEX) &&
+           VerifyField<uint16_t>(verifier, VT_TYPE) &&
+           VerifyField<Eater::GameData::Vec3>(verifier, VT_POSITION) &&
+           verifier.EndTable();
+  }
+};
+
+struct ObjectDataBuilder {
+  typedef ObjectData Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_index(uint16_t index) {
+    fbb_.AddElement<uint16_t>(ObjectData::VT_INDEX, index, 0);
+  }
+  void add_type(uint16_t type) {
+    fbb_.AddElement<uint16_t>(ObjectData::VT_TYPE, type, 0);
+  }
+  void add_position(const Eater::GameData::Vec3 *position) {
+    fbb_.AddStruct(ObjectData::VT_POSITION, position);
+  }
+  explicit ObjectDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<ObjectData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<ObjectData>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<ObjectData> CreateObjectData(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t index = 0,
+    uint16_t type = 0,
+    const Eater::GameData::Vec3 *position = 0) {
+  ObjectDataBuilder builder_(_fbb);
+  builder_.add_position(position);
+  builder_.add_type(type);
+  builder_.add_index(index);
   return builder_.Finish();
 }
 

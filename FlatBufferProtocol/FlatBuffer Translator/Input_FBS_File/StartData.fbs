@@ -45,6 +45,9 @@ table UserData
 {
 	key:uint;				// 유저 고유 식별번호
 	character_type:ushort;	// 캐릭터 종류
+	player_index:ushort;	// 몇번 플레이어인가?
+	position:Vec3;			// 시작 위치
+	speed:float;			// 속도
 }
 
 table MatchData

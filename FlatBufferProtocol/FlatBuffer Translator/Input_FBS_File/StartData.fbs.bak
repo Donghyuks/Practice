@@ -36,7 +36,7 @@ table ManaPosition
 table GameData
 {
 	day:byte;
-	manacount:ushort;
+	manacount:ushort;				// 해당 날에 생성되는 마나석 개수
 	manaspawn:[ManaPosition];		// 마나석 생성 위치
 	enemyspawn:[EnemyPosition];		// 적 생성 위치
 }
@@ -45,6 +45,8 @@ table UserData
 {
 	key:uint;				// 유저 고유 식별번호
 	character_type:ushort;	// 캐릭터 종류
+	position:Vec3;			// 시작 위치
+	speed:float;			// 속도
 }
 
 table MatchData
