@@ -22,5 +22,6 @@
     </ClInclude>
     <ClInclude Include="..\ImportLibrary\Inc\PortIPDefine.h" />
     <ClInclude Include="..\ImportLibrary\Inc\GameClientGameServerPacketDefine.h" />
+    <ClInclude Include="..\ImportLibrary\Inc\WorldData_generated.h" />
   </ItemGroup>
 </Project>

@@ -8,6 +8,9 @@
 		
 */
 
+// Server & Client Physics Update time
+#define PHYSX_UPDATE_TIME				0.016
+
 // Server Frequency
 #define SERVER_FREQUENCY				20
 

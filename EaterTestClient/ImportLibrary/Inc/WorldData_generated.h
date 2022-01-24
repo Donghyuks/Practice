@@ -188,23 +188,48 @@ struct ClientMove FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef ClientMoveBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_SEQUENCE = 4,
-    VT_DTIME = 6,
-    VT_MOV_VECTOR = 8
+    VT_FORWARD = 6,
+    VT_BACK = 8,
+    VT_RIGHT = 10,
+    VT_LEFT = 12,
+    VT_DASH = 14,
+    VT_SKILL1 = 16,
+    VT_SKILL2 = 18
   };
-  uint16_t sequence() const {
-    return GetField<uint16_t>(VT_SEQUENCE, 0);
+  uint32_t sequence() const {
+    return GetField<uint32_t>(VT_SEQUENCE, 0);
   }
-  double dtime() const {
-    return GetField<double>(VT_DTIME, 0.0);
+  bool forward() const {
+    return GetField<uint8_t>(VT_FORWARD, 0) != 0;
   }
-  const Eater::GameData::Vec3 *mov_vector() const {
-    return GetStruct<const Eater::GameData::Vec3 *>(VT_MOV_VECTOR);
+  bool back() const {
+    return GetField<uint8_t>(VT_BACK, 0) != 0;
+  }
+  bool right() const {
+    return GetField<uint8_t>(VT_RIGHT, 0) != 0;
+  }
+  bool left() const {
+    return GetField<uint8_t>(VT_LEFT, 0) != 0;
+  }
+  bool dash() const {
+    return GetField<uint8_t>(VT_DASH, 0) != 0;
+  }
+  bool skill1() const {
+    return GetField<uint8_t>(VT_SKILL1, 0) != 0;
+  }
+  bool skill2() const {
+    return GetField<uint8_t>(VT_SKILL2, 0) != 0;
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<uint16_t>(verifier, VT_SEQUENCE) &&
-           VerifyField<double>(verifier, VT_DTIME) &&
-           VerifyField<Eater::GameData::Vec3>(verifier, VT_MOV_VECTOR) &&
+           VerifyField<uint32_t>(verifier, VT_SEQUENCE) &&
+           VerifyField<uint8_t>(verifier, VT_FORWARD) &&
+           VerifyField<uint8_t>(verifier, VT_BACK) &&
+           VerifyField<uint8_t>(verifier, VT_RIGHT) &&
+           VerifyField<uint8_t>(verifier, VT_LEFT) &&
+           VerifyField<uint8_t>(verifier, VT_DASH) &&
+           VerifyField<uint8_t>(verifier, VT_SKILL1) &&
+           VerifyField<uint8_t>(verifier, VT_SKILL2) &&
            verifier.EndTable();
   }
 };
@@ -213,14 +238,29 @@ struct ClientMoveBuilder {
   typedef ClientMove Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_sequence(uint16_t sequence) {
-    fbb_.AddElement<uint16_t>(ClientMove::VT_SEQUENCE, sequence, 0);
+  void add_sequence(uint32_t sequence) {
+    fbb_.AddElement<uint32_t>(ClientMove::VT_SEQUENCE, sequence, 0);
   }
-  void add_dtime(double dtime) {
-    fbb_.AddElement<double>(ClientMove::VT_DTIME, dtime, 0.0);
+  void add_forward(bool forward) {
+    fbb_.AddElement<uint8_t>(ClientMove::VT_FORWARD, static_cast<uint8_t>(forward), 0);
   }
-  void add_mov_vector(const Eater::GameData::Vec3 *mov_vector) {
-    fbb_.AddStruct(ClientMove::VT_MOV_VECTOR, mov_vector);
+  void add_back(bool back) {
+    fbb_.AddElement<uint8_t>(ClientMove::VT_BACK, static_cast<uint8_t>(back), 0);
+  }
+  void add_right(bool right) {
+    fbb_.AddElement<uint8_t>(ClientMove::VT_RIGHT, static_cast<uint8_t>(right), 0);
+  }
+  void add_left(bool left) {
+    fbb_.AddElement<uint8_t>(ClientMove::VT_LEFT, static_cast<uint8_t>(left), 0);
+  }
+  void add_dash(bool dash) {
+    fbb_.AddElement<uint8_t>(ClientMove::VT_DASH, static_cast<uint8_t>(dash), 0);
+  }
+  void add_skill1(bool skill1) {
+    fbb_.AddElement<uint8_t>(ClientMove::VT_SKILL1, static_cast<uint8_t>(skill1), 0);
+  }
+  void add_skill2(bool skill2) {
+    fbb_.AddElement<uint8_t>(ClientMove::VT_SKILL2, static_cast<uint8_t>(skill2), 0);
   }
   explicit ClientMoveBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -235,13 +275,23 @@ struct ClientMoveBuilder {
 
 inline flatbuffers::Offset<ClientMove> CreateClientMove(
     flatbuffers::FlatBufferBuilder &_fbb,
-    uint16_t sequence = 0,
-    double dtime = 0.0,
-    const Eater::GameData::Vec3 *mov_vector = 0) {
+    uint32_t sequence = 0,
+    bool forward = false,
+    bool back = false,
+    bool right = false,
+    bool left = false,
+    bool dash = false,
+    bool skill1 = false,
+    bool skill2 = false) {
   ClientMoveBuilder builder_(_fbb);
-  builder_.add_dtime(dtime);
-  builder_.add_mov_vector(mov_vector);
   builder_.add_sequence(sequence);
+  builder_.add_skill2(skill2);
+  builder_.add_skill1(skill1);
+  builder_.add_dash(dash);
+  builder_.add_left(left);
+  builder_.add_right(right);
+  builder_.add_back(back);
+  builder_.add_forward(forward);
   return builder_.Finish();
 }
 

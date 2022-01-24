@@ -35,14 +35,18 @@ table ClientStat
 
 table ClientMove
 {
-	sequence:ushort;		// 시퀀스 번호
-	dtime:double;			// dtime
-	mov_vector:Vec3;		// Vector3 방향 벡터
+	sequence:uint;		// 시퀀스 번호
+	up:bool;			// dtime
+	down:bool;			// Vector3 방향 벡터
+	right:bool;			// Vector3 방향 벡터
+	left:bool;			// Vector3 방향 벡터
 }
 
 table WorldData
 {
 	users:[UserData];		// UserData 벡터
+	enemies:[EnemyData];	// EnemyData 벡터
+	objects:[ObjectData];	// ObjectData 벡터
 }
 
 table UserData
@@ -53,9 +57,9 @@ table UserData
 	sequence:ushort;		// 시퀀스 번호
 }
 
-table MonsterData
+table EnemyData
 {
-	index:ushort;			// 몬스터 번호
+	index:ushort;			// 적 번호
 	animation:ushort;		// 애니메이션 상태
 	position:Vec3;			// 위치
 	mov_vector:Vec3;		// 방향 벡터

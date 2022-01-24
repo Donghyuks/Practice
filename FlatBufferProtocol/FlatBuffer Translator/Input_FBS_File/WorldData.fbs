@@ -35,9 +35,14 @@ table ClientStat
 
 table ClientMove
 {
-	sequence:ushort;		// 시퀀스 번호
-	dtime:double;			// dtime
-	mov_vector:Vec3;		// Vector3 방향 벡터
+	sequence:uint;		// 시퀀스 번호
+	forward:bool;		// 앞쪽 방향
+	back:bool;			// 뒤쪽 방향
+	right:bool;			// 오른쪽 방향
+	left:bool;			// 왼쪽 방향
+	dash:bool;			// 대쉬
+	skill1:bool;		// 스킬 1번
+	skill2:bool;		// 스킬 2번
 }
 
 table WorldData

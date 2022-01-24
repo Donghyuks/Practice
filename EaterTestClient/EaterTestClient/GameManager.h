@@ -23,14 +23,15 @@ using namespace std;
 // 싱글톤으로 생성한 D2D 엔진 쉽게 쓰려구
 #define MYD2D D2DEngine::GetInctance()
 
-// 최대 시퀀스 개수 (unsigned short 형이므로 대충 6만개..)
-#define MAX_SEQUENCE		60000
+// 최대 시퀀스 개수 (unsigned int)
+#define MAX_SEQUENCE		0xFFFFFFFF
 
 class Object;
 class DHTimer;
 class DHKeyIO;
 class DHNetWorkAPI;
 struct C2S_Packet;
+class PhysData;
 
 struct Enemy
 {
@@ -56,7 +57,8 @@ struct Player
 		m_Position = _rhs.m_Position;
 	}
 
-	unsigned short					m_Sequence = 0;
+	PhysData*						m_PhysX = nullptr;
+	unsigned int					m_Sequence = 0;
 	unsigned short					m_Animation = ANIMATION_IDLE;
 	unsigned short					m_Character = 0;
 	double							m_Speed = 0.f;
@@ -66,10 +68,17 @@ struct Player
 
 struct FrameData
 {
-	unsigned short					m_Sequence;			// 시퀀스 번호.
-	DirectX::SimpleMath::Vector3	m_Position;			// 현재 프레임에서의 위치 (방향벡터 계산후의 값)
-	DirectX::SimpleMath::Vector3	m_Mov_Vector;		// 이동할 방향
-	double							m_dtime;			// dtime 값
+	DirectX::SimpleMath::Vector3 m_Predict_Position;
+	DirectX::SimpleMath::Vector3 m_Mov_Vec3;
+	unsigned int		m_Sequence	= 0;			// 시퀀스 번호.
+	// KeyIO 정보
+	bool				m_forward	= false;
+	bool				m_back		= false;
+	bool				m_right		= false;
+	bool				m_left		= false;
+	bool				m_dash		= false;
+	bool				m_skill1	= false;
+	bool				m_skill2	= false;
 };
 
 /// 게임 진행 총괄 매니저.
@@ -88,6 +97,7 @@ private:
 
 	DHKeyIO* m_KeyIO = nullptr;
 	DHTimer* m_Timer = nullptr;
+	DHTimer* m_KeyIO_Timer = nullptr;
 
 	std::vector<Enemy> Enemy_List;
 	std::vector<ManaStone> Mana_List;
@@ -100,11 +110,15 @@ private:
 	double m_Dtime = 0.f;
 	// 클라이언트에서 선실행하는 데이터
 	std::queue<FrameData*> m_Client_Predict;
+	// BackUp 용 데이터
+	std::queue<FrameData*> m_Client_BackUp;
 	// 클라이언트의 움직임을 기억할 방향벡터 (한프레임 처리후 서버에 보냄)
 	DirectX::SimpleMath::Vector3 m_Client_Move_Vector;
-	// 게임을 진행하는 플레이어들
+	// 게임을 진행하는 상대 플레이어
 	std::map<unsigned short, Player*> m_Player_List;
-	Player* m_Player = nullptr;		// 현재 내가 무슨 플레이어인지
+	Player* m_Current_Player	= nullptr;		// 현재 플레이어 정보
+	Player* m_Dest_Player		= nullptr;		// 목적 플레이어 정보 ( 목적으로 하는 플레이어 )
+	FrameData* _FData = nullptr;		// 한프레임 데이터 기록
 	// 네트워크로부터 역할을 부여받았는가? (게임이 시작되었는가?)
 	bool m_Is_Start = false;
 	// 테스트..
@@ -121,7 +135,8 @@ public:
 	// 메인 게임 루프. 실제 게임이 진행되는 반복구문
 	void Loop();
 	void GameLoop();
-	void TestLoop();
+	void KeyIO_Recording();
+	void PhysX_World_Update();
 
 	// 게임을 정리한다.
 	void Finalize();

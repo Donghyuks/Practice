@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClInclude Include="..\ImportLibrary\Inc\GameClientGameServerPacketDefine.h" />
     <ClInclude Include="..\ImportLibrary\Inc\PortIPDefine.h" />
+    <ClInclude Include="..\ImportLibrary\Inc\WorldData_generated.h" />
     <ClInclude Include="GameManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
