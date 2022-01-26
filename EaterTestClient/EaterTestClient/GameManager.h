@@ -14,9 +14,7 @@
 #include <chrono>
 
 // 디버그용 콘솔창
-#ifdef _DEBUG
 #pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
-#endif
 
 using namespace std;
 
@@ -126,7 +124,7 @@ private:
 	// 현재 클라이언트가 서버로부터 데이터를 받고 지난 시간
 	double m_Passed_Client_Time = 0.f;
 	// 데이터 정보 오차범위
-	double m_Epsilon = 0.01f;
+	double m_Epsilon = 0.3f;
 
 public:
 	// 게임용 윈도 프레임웍을 초기화한다.

@@ -383,7 +383,8 @@ struct UserData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_PLAYERINDEX = 4,
     VT_ANIMATION = 6,
     VT_POSITION = 8,
-    VT_SEQUENCE = 10
+    VT_MOV_VECTOR = 10,
+    VT_SEQUENCE = 12
   };
   uint16_t playerindex() const {
     return GetField<uint16_t>(VT_PLAYERINDEX, 0);
@@ -394,6 +395,9 @@ struct UserData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const Eater::GameData::Vec3 *position() const {
     return GetStruct<const Eater::GameData::Vec3 *>(VT_POSITION);
   }
+  const Eater::GameData::Vec3 *mov_vector() const {
+    return GetStruct<const Eater::GameData::Vec3 *>(VT_MOV_VECTOR);
+  }
   uint16_t sequence() const {
     return GetField<uint16_t>(VT_SEQUENCE, 0);
   }
@@ -402,6 +406,7 @@ struct UserData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint16_t>(verifier, VT_PLAYERINDEX) &&
            VerifyField<uint16_t>(verifier, VT_ANIMATION) &&
            VerifyField<Eater::GameData::Vec3>(verifier, VT_POSITION) &&
+           VerifyField<Eater::GameData::Vec3>(verifier, VT_MOV_VECTOR) &&
            VerifyField<uint16_t>(verifier, VT_SEQUENCE) &&
            verifier.EndTable();
   }
@@ -419,6 +424,9 @@ struct UserDataBuilder {
   }
   void add_position(const Eater::GameData::Vec3 *position) {
     fbb_.AddStruct(UserData::VT_POSITION, position);
+  }
+  void add_mov_vector(const Eater::GameData::Vec3 *mov_vector) {
+    fbb_.AddStruct(UserData::VT_MOV_VECTOR, mov_vector);
   }
   void add_sequence(uint16_t sequence) {
     fbb_.AddElement<uint16_t>(UserData::VT_SEQUENCE, sequence, 0);
@@ -439,8 +447,10 @@ inline flatbuffers::Offset<UserData> CreateUserData(
     uint16_t playerindex = 0,
     uint16_t animation = 0,
     const Eater::GameData::Vec3 *position = 0,
+    const Eater::GameData::Vec3 *mov_vector = 0,
     uint16_t sequence = 0) {
   UserDataBuilder builder_(_fbb);
+  builder_.add_mov_vector(mov_vector);
   builder_.add_position(position);
   builder_.add_sequence(sequence);
   builder_.add_animation(animation);

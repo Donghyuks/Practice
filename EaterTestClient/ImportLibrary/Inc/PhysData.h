@@ -105,6 +105,7 @@ private:
 	bool isMove;
 	bool isForce;
 	bool isVelocity;
+	bool isPosition;
 private:
 	void* ActorObj = nullptr;
 	TriangleMeshData* Triangle = nullptr;

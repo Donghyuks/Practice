@@ -5,8 +5,8 @@
 
 /// wrold 좌표계 상 크기. DIP 개념 사용.
 // 기준이 될 화면 크기.
-#define WORLD_SCREEN_X 1920
-#define WORLD_SCREEN_Y 1080
+#define WORLD_SCREEN_X 1200
+#define WORLD_SCREEN_Y 600
 
 // Text상 출력될 최대 숫자.
 #define MAX_WORD 512

@@ -24,19 +24,7 @@ HRESULT GameManager::Initialize(HINSTANCE hInstance)
 	m_KeyIO_Timer = new DHTimer();
 	m_KeyIO_Timer->SetFrame(60);
 
-	// PhysX
-#ifdef _DEBUG
-	PhysX_Initialize(4, nullptr, false);
-#else
-	PhysX_Initialize(4, nullptr, false);
-#endif
-
 	_Send_Packet = new C2S_Packet();
-
-	// 플레이어 데이터.
-	m_Dest_Player = new Player();
-	m_Dest_Player->m_PhysX = new PhysData();
-	m_Dest_Player->m_PhysX->SetLockAxis_Position(false, true, false);
 
 	/// Win32 관련
 	// 윈도 클래스
@@ -64,6 +52,32 @@ HRESULT GameManager::Initialize(HINSTANCE hInstance)
 	if (!g_hwnd) return S_FALSE;
 
 	scanf_s("%d", &m_Key);
+
+
+	// PhysX
+//#ifdef _DEBUG
+//	PhysX_Initialize(4, nullptr, false);
+//#else
+//	PhysX_Initialize(4, nullptr, false);
+//#endif
+
+	if (m_Key == 0)
+	{
+		//PhysX_Initialize(4, nullptr, true);
+		PhysX_Initialize(4, nullptr, false);
+	}
+	else
+	{
+		//PhysX_Initialize(4, nullptr, true);
+		PhysX_Initialize(4, nullptr, false);
+	}
+
+	// 플레이어 데이터.
+	m_Dest_Player = new Player();
+	m_Dest_Player->m_PhysX = new PhysData();
+	m_Dest_Player->m_PhysX->SetLockAxis_Position(false, true, false);
+	m_Dest_Player->m_PhysX->SetLockAxis_Rotation(true, true, true);
+
 
 	// 서버 연결..
 	m_Network = new DHNetWorkAPI();
@@ -187,10 +201,17 @@ void GameManager::GameLoop()
 						if (_Player_Index == m_Player_Number)
 						{
 							m_Current_Player = m_Player_List[m_Player_Number];
-							m_Dest_Player->m_PhysX->SetLockAxis_Position(false, true, false);
-							m_Dest_Player->m_PhysX->SetLockAxis_Rotation(true, true, true);
 							m_Dest_Player->m_PhysX->SetWorldPosition(m_Current_Player->m_Position.x, m_Current_Player->m_Position.y, m_Current_Player->m_Position.z);
 							PhysX_Create_Actor(m_Dest_Player->m_PhysX);
+						}
+						/// 임시로 상대유저는 동적인 메쉬로 등록해놓음
+						else
+						{
+							m_Player_List[_Player_Index]->m_PhysX->SetLockAxis_Position(false, true, false);
+							m_Player_List[_Player_Index]->m_PhysX->SetLockAxis_Rotation(true, true, true);
+							m_Player_List[_Player_Index]->m_PhysX->SetWorldPosition(Player_Data->world_position()->x(),
+								Player_Data->world_position()->y(), Player_Data->world_position()->z());
+							PhysX_Create_Actor(m_Player_List[_Player_Index]->m_PhysX);
 						}
 					}
 
@@ -253,6 +274,8 @@ void GameManager::GameLoop()
 						auto _Animation = Player_Data->animation();
 						// Position
 						auto _Position = Player_Data->position();
+						// Mov_Vec
+						auto _Mov_Vec = Player_Data->mov_vector();
 
 						// 현재 플레이중인 데이터
 						if (_Player_Index == m_Player_Number)
@@ -272,6 +295,12 @@ void GameManager::GameLoop()
 									{
 										// 서버로 부터 받은 데이터로 백업 후 상태를 재 시뮬레이션 한다.
 										m_Dest_Player->m_PhysX->SetWorldPosition(_Position->x(), _Position->y(), _Position->z());
+										m_Dest_Player->m_Position = m_Dest_Player->m_PhysX->WorldPosition;
+										m_Dest_Player->m_PhysX->SetVelocity(_Mov_Vec->x(), _Mov_Vec->y(), _Mov_Vec->z());
+
+										// 정의된 dtime 을 기준으로하여 물리 연산 업데이트.
+										//PhysX_Update(PHYSX_UPDATE_TIME);
+										//PhysX_Update_Actor(m_Dest_Player->m_PhysX);
 
 										m_Client_BackUp = m_Client_Predict;
 
@@ -282,7 +311,9 @@ void GameManager::GameLoop()
 											m_Client_BackUp.pop();
 
 											// 백업 플레이어의 속도를 주고, 물리 시뮬레이션을 지정하여, 프레임의 데이터값을 수정한다.
-											m_Dest_Player->m_PhysX->SetVelocity(_BackUp_FData->m_Mov_Vec3.x, _BackUp_FData->m_Mov_Vec3.y, _BackUp_FData->m_Mov_Vec3.z);
+											m_Dest_Player->m_PhysX->SetVelocity(_Mov_Vec->x() + _BackUp_FData->m_Mov_Vec3.x, 
+												_BackUp_FData->m_Mov_Vec3.y + _Mov_Vec->y(),
+												_BackUp_FData->m_Mov_Vec3.z + _Mov_Vec->z());
 											
 											// 정의된 dtime 을 기준으로하여 물리 연산 업데이트.
 											PhysX_Update(PHYSX_UPDATE_TIME);
@@ -313,6 +344,8 @@ void GameManager::GameLoop()
 							m_Player_List[_Player_Index]->m_Prev_Position = m_Player_List[_Player_Index]->m_Position;
 							m_Player_List[_Player_Index]->m_Position = DirectX::SimpleMath::Vector3(_Position->x(), _Position->y(), _Position->z());
 							m_Player_List[_Player_Index]->m_Animation = _Animation;
+							m_Player_List[m_Player_Number]->m_PhysX->SetWorldPosition(_Position->x(), _Position->y(), _Position->z());
+							m_Player_List[m_Player_Number]->m_PhysX->SetVelocity(_Mov_Vec->x(), _Mov_Vec->y(), _Mov_Vec->z());
 						}
 					}
 				}
@@ -336,24 +369,26 @@ void GameManager::GameLoop()
 	MYD2D->thDrawText(10, 50, D2D1::ColorF(1.0f, 0.0f, 0.0f), L"Setting RTT : %.2f s", m_RTT );
 	MYD2D->thDrawText(10, 70, D2D1::ColorF(1.0f, 0.0f, 0.0f), L"Passed Client Time : %.2f s", m_Passed_Client_Time);
 
+	float Scaleing = 10.f;
+
 	// 마나스톤 그리기
 	for (auto _Mana_Stone : Mana_List)
 	{
 		// 2D 상 쉽게 보이기위해 보정
-		DirectX::SimpleMath::Vector3 _ADD_Pos(300, 0, 500);
-		DirectX::SimpleMath::Vector3 _Draw_Pos = _Mana_Stone.Position * 3 + _ADD_Pos;
+		DirectX::SimpleMath::Vector3 _ADD_Pos(100, 0, 250);
+		DirectX::SimpleMath::Vector3 _Draw_Pos = (_Mana_Stone.Position * Scaleing) + _ADD_Pos;
 		MYD2D->thDrawText(_Draw_Pos.x, _Draw_Pos.z, D2D1::ColorF(0.0f, 0.0f, 0.0f), L"%d", _Mana_Stone.Index);
-		MYD2D->thDrawEllipse(_Draw_Pos.x, _Draw_Pos.z, 7, 1, D2D1::ColorF(0.0f, 0.0f, 1.0f));
+		MYD2D->thDrawEllipse(_Draw_Pos.x, _Draw_Pos.z , 1 * Scaleing, 1, D2D1::ColorF(0.0f, 0.0f, 1.0f));
 	}
 
 	// 적 그리기
 	for (auto _Enemy : Enemy_List)
 	{
 		// 2D 상 쉽게 보이기위해 보정
-		DirectX::SimpleMath::Vector3 _ADD_Pos(300, 0, 500);
-		DirectX::SimpleMath::Vector3 _Draw_Pos = _Enemy.Position * 3 + _ADD_Pos;
+		DirectX::SimpleMath::Vector3 _ADD_Pos(100, 0, 250);
+		DirectX::SimpleMath::Vector3 _Draw_Pos = (_Enemy.Position * Scaleing) + _ADD_Pos;
 		MYD2D->thDrawText(_Draw_Pos.x, _Draw_Pos.z, D2D1::ColorF(0.0f, 0.0f, 0.0f), L"%d", _Enemy.Index);
-		MYD2D->thDrawEllipse(_Draw_Pos.x, _Draw_Pos.z, 7, 1, D2D1::ColorF(1.0f, 0.0f, 1.0f));
+		MYD2D->thDrawEllipse(_Draw_Pos.x, _Draw_Pos.z, 1 * Scaleing, 1, D2D1::ColorF(1.0f, 0.0f, 1.0f));
 	}
 
 	// 보간을 적용할 포지션
@@ -362,6 +397,9 @@ void GameManager::GameLoop()
 	// 보간계수 (서버의 통신시간 (20프레임) 으로 현재 클라이언트가 네트워크로부터 데이터를 받은후 부터 지난 시간을 나눈다 )
 	double _Interpolation = m_Passed_Client_Time / m_RTT;
 	if (_Interpolation >= 1.0f) _Interpolation = 1.0f;
+
+	/// 좌표상 보여주기 편하기위해서 좌표보정.
+	DirectX::SimpleMath::Vector3 _Offset_Vec(100, 0, 250);
 
 	/// 상대유저 (보간)
 
@@ -373,28 +411,32 @@ void GameManager::GameLoop()
 		Player* _Other_Player = _Other.second;
 
 		_Interpolation_Pos = DirectX::SimpleMath::Vector3::Lerp(_Other_Player->m_Prev_Position, _Other_Player->m_Position, _Interpolation);
+		_Interpolation_Pos *= Scaleing;
+		_Interpolation_Pos += _Offset_Vec;
 
 		if (_Other_Player->m_Animation == ANIMATION_IDLE)
 		{
 			// 상대 유저는 가만히 있을때 빨간색 원 움직일때 빨간색 네모
-			MYD2D->thDrawEllipse(_Interpolation_Pos.x, _Interpolation_Pos.z, 20, 2, D2D1::ColorF(1.0f, 0.0f, 0.0f));
+			MYD2D->thDrawEllipse(_Interpolation_Pos.x, _Interpolation_Pos.z, 1 * Scaleing, 2, D2D1::ColorF(1.0f, 0.0f, 0.0f));
 		}
 		else if (_Other_Player->m_Animation == ANIMATION_RUN)
 		{
 			// 상대 유저는 가만히 있을때 빨간색 원 움직일때 빨간색 네모
-			MYD2D->thDrawRectangle(_Interpolation_Pos.x - 20, _Interpolation_Pos.z - 20,
-				_Interpolation_Pos.x + 20, _Interpolation_Pos.z + 20, 0.f, 2, D2D1::ColorF(1.0f, 0.0f, 0.0f));
+			MYD2D->thDrawRectangle(_Interpolation_Pos.x - 4, _Interpolation_Pos.z - 4,
+				_Interpolation_Pos.x + 4, _Interpolation_Pos.z + 4, 0.f, 2, D2D1::ColorF(1.0f, 0.0f, 0.0f));
 		}
 	}
 
 	/// 현재유저 (예측)
 
 	_Interpolation_Pos = DirectX::SimpleMath::Vector3::Lerp(m_Current_Player->m_Position, m_Dest_Player->m_Position, _Interpolation);
+	_Interpolation_Pos *= Scaleing;
+	_Interpolation_Pos += _Offset_Vec;
 
 	if (m_Current_Player->m_Animation == ANIMATION_IDLE)
 	{
 		// 가만히 있는 경우 초록색 원
-		MYD2D->thDrawEllipse(_Interpolation_Pos.x, _Interpolation_Pos.z, 20, 2, D2D1::ColorF(0.0f, 1.0f, 0.0f));
+		MYD2D->thDrawEllipse(_Interpolation_Pos.x, _Interpolation_Pos.z, 1 * Scaleing, 2, D2D1::ColorF(0.0f, 1.0f, 0.0f));
 	}
 	else if (m_Current_Player->m_Animation == ANIMATION_RUN)
 	{
@@ -422,7 +464,7 @@ void GameManager::KeyIO_Recording()
 	_FData->m_Sequence = m_Player_List[m_Player_Number]->m_Sequence;
 
 	/// 키 입력을 기록해 둔다.
-	DirectX::SimpleMath::Vector3 _Mov_Vec;
+	DirectX::SimpleMath::Vector3 _Mov_Vec = DirectX::SimpleMath::Vector3(0,0,0);
 	// 1p 조작
 	if (m_Player_Number == EATER_PLAYER_01)
 	{
@@ -479,23 +521,20 @@ void GameManager::KeyIO_Recording()
 	}
 	_Mov_Vec *= m_Current_Player->m_Speed;
 
-	if (_Mov_Vec != DirectX::SimpleMath::Vector3(0, 0, 0))
-	{
-		// 물리 처리를 위한 속도 설정.
-		m_Dest_Player->m_PhysX->SetVelocity(_Mov_Vec.x, _Mov_Vec.y, _Mov_Vec.z);
-		_FData->m_Mov_Vec3 = _Mov_Vec;
+	// 물리 처리를 위한 속도 설정.
+	m_Dest_Player->m_PhysX->SetVelocity(_Mov_Vec.x, _Mov_Vec.y, _Mov_Vec.z);
+	_FData->m_Mov_Vec3 = _Mov_Vec;
 
-		auto _KeyIO_Data = Eater::GameData::CreateClientMove(_Builder, _FData->m_Sequence, _FData->m_forward, _FData->m_back, _FData->m_right, _FData->m_left, _FData->m_dash, _FData->m_skill1, _FData->m_skill2);
+	auto _KeyIO_Data = Eater::GameData::CreateClientMove(_Builder, _FData->m_Sequence, _FData->m_forward, _FData->m_back, _FData->m_right, _FData->m_left, _FData->m_dash, _FData->m_skill1, _FData->m_skill2);
 
-		// 데이터 직렬화 후 전송.
-		_Builder.Finish(_KeyIO_Data);
+	// 데이터 직렬화 후 전송.
+	_Builder.Finish(_KeyIO_Data);
 
-		_Send_Packet->Packet_Type = C2S_PLAYER_MOVE;
-		_Send_Packet->Packet_Size = _Builder.GetSize();
-		memcpy_s(_Send_Packet->Packet_Buffer, _Builder.GetSize(), _Builder.GetBufferPointer(), _Builder.GetSize());
+	_Send_Packet->Packet_Type = C2S_PLAYER_MOVE;
+	_Send_Packet->Packet_Size = _Builder.GetSize();
+	memcpy_s(_Send_Packet->Packet_Buffer, _Builder.GetSize(), _Builder.GetBufferPointer(), _Builder.GetSize());
 
-		m_Network->Send(_Send_Packet);
-	}
+	m_Network->Send(_Send_Packet);
 }
 
 void GameManager::PhysX_World_Update()
