@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Main">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Programmers">
+      <UniqueIdentifier>{bcc692e1-58be-43f8-9e90-355232c1241a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Programmers\DFS/BFS">
+      <UniqueIdentifier>{c3495b45-4801-44a8-a3f7-db119078136a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Programmers\CodingTestBase">
+      <UniqueIdentifier>{71ca5dee-9138-419a-9e70-bddc8c147d2a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="2_NetWork.h">
+      <Filter>Programmers\DFS/BFS</Filter>
+    </ClInclude>
+    <ClInclude Include="CodingTest.h">
+      <Filter>Programmers\CodingTestBase</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="2_NetWork.cpp">
+      <Filter>Programmers\DFS/BFS</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
