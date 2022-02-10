@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="BitOperation">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="ConstPointer">
+      <UniqueIdentifier>{685610c9-3311-4647-8984-68239ec500d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RandomGacha">
+      <UniqueIdentifier>{970fe765-49f6-4ea7-a3fd-4ab7399fcf99}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="BOmain.cpp">
+      <Filter>BitOperation</Filter>
+    </ClCompile>
+    <ClCompile Include="BitOperation.cpp">
+      <Filter>BitOperation</Filter>
+    </ClCompile>
+    <ClCompile Include="CPmain.cpp">
+      <Filter>ConstPointer</Filter>
+    </ClCompile>
+    <ClCompile Include="ConstPointer.cpp">
+      <Filter>ConstPointer</Filter>
+    </ClCompile>
+    <ClCompile Include="RGmain.cpp">
+      <Filter>RandomGacha</Filter>
+    </ClCompile>
+    <ClCompile Include="RandomGacha.cpp">
+      <Filter>RandomGacha</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BitOperation.h">
+      <Filter>BitOperation</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstPointer.h">
+      <Filter>ConstPointer</Filter>
+    </ClInclude>
+    <ClInclude Include="RandomGacha.h">
+      <Filter>RandomGacha</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
