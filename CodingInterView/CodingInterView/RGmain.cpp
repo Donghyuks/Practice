@@ -6,27 +6,12 @@ int main()
 	RandomGacha RG;
 	RG.SetStarForce("../RandomTable/StarForce.csv");
 
+	RG.MakeWeapon(1000);
+
+	RG.ReinforceStarforce();
+
 	return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //// compile with: /EHsc /W4
 //
