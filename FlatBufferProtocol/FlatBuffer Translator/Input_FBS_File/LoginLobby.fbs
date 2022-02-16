@@ -1,0 +1,36 @@
+// LoginServer와 LobbyServer 사이의 패킷 데이터.
+
+// 데이터 형에 대한 정의
+// 8 bit: byte (int8), ubyte (uint8), bool
+// 16 bit: short (int16), ushort (uint16)
+// 32 bit: int (int32), uint (uint32), float (float32)
+// 64 bit: long (int64), ulong (uint64), double (float64)
+
+namespace Eater.LoginLobby;
+
+// 유저들의 상태를 알려주기 위한 구조체
+table CurrentLobbyState
+{
+	users:[UserState];
+}
+
+// 유저들의 상태 정보
+table UserState
+{
+	state:ubyte;	// 유저의 상태 (로그인 / 로그아웃 등..)
+	id:string;		// 유저의 아이디
+}
+
+// 로그인 시 해당 정보 전송
+table LoginUser
+{
+	key:uint;		// 유저의 고유 식별번호
+	id:string;		// 유저의 아이디
+}
+
+// 로그아웃 시 해당 정보 전송
+table LogoutUser
+{
+	key:uint;		// 유저의 고유 식별번호
+	id:string;		// 유저의 아이디
+}
