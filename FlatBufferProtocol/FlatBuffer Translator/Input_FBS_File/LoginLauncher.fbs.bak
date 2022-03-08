@@ -50,10 +50,9 @@ table AcceptFriend
 }
 
 // 게임을 시작한 유저의 아이디
-table PlayState
+table StartGame
 {
 	id:string;
-	state:bool;
 }
 
 // 아이디 생성 요청
